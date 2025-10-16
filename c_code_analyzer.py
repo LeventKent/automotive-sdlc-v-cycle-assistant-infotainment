@@ -194,7 +194,7 @@ Focus on automotive safety standards and provide clear, actionable feedback."""
 unit_test_agent = Agent(
     name="unit_test_generator",
     model=model,
-    tools=[generate_unit_tests],
+    #tools=[generate_unit_tests],
     system_prompt="""You are a unit test generator for C code in automotive applications. Your job is to:
 1. Generate comprehensive unit tests for C functions
 2. Include edge cases and boundary conditions
@@ -221,9 +221,7 @@ def should_generate_tests(state):
         result_text = str(misra_result.result).lower()
     else:
         result_text = str(misra_result).lower()
-    
-    print(f"DEBUG: Analyzing result text for conditions...")
-    print(f"DEBUG: First 300 chars of result: {result_text[:300]}...")
+
     
     # Simple approach: Look for HIGH severity violations that should block unit test generation
     # Everything else (LOW, MEDIUM, or COMPLIANT) should allow unit test generation
@@ -235,49 +233,14 @@ def should_generate_tests(state):
         "**overall severity**: high",
         "severity: high"
     ]
-    
-    # Specific violation patterns (but only if they indicate actual usage, not just mention)
-    violation_usage_patterns = [
-        "uses malloc",
-        "calls malloc", 
-        "malloc is used",
-        "malloc usage",
-        "uses free",
-        "calls free",
-        "free is used",
-        "uses calloc",
-        "calls calloc",
-        "uses realloc",
-        "calls realloc"
-    ]
+
     
     # Check for blocking patterns
     for pattern in blocking_patterns:
         if pattern in result_text:
             print(f"DEBUG: Found blocking pattern: {pattern}")
             return False
-    
-    # Check for specific violation usage patterns
-    for pattern in violation_usage_patterns:
-        if pattern in result_text:
-            print(f"DEBUG: Found violation usage pattern: {pattern}")
-            return False
-    
-    # If we reach here, no blocking patterns were found
-    # Check for positive indicators to be sure
-    positive_patterns = [
-        "low",
-        "medium", 
-        "compliant",
-        "no violations",
-        "suitable for unit test"
-    ]
-    
-    for pattern in positive_patterns:
-        if pattern in result_text:
-            print(f"DEBUG: Found positive pattern: {pattern}")
-            return True
-    
+        
     # Default: if no blocking patterns found, allow unit test generation
     print("DEBUG: No blocking patterns found, allowing unit test generation")
     return True
@@ -330,35 +293,9 @@ Please use the verify_misra_subset_compliance tool to analyze the code and provi
         print(f"Graph execution completed. Nodes executed: {graph_result.completed_nodes}/{graph_result.total_nodes}")
         print(f"Execution order: {[node.node_id for node in graph_result.execution_order]}")
         
-        # Debug: Check what nodes were executed
-        executed_nodes = [node.node_id for node in graph_result.execution_order]
-        print(f"DEBUG: Executed nodes: {executed_nodes}")
-        
-        if "unit_test_generator" not in executed_nodes:
-            print("DEBUG: Unit test generator was not executed - checking condition function")
-            # Test the condition function manually
-            if graph_result.results.get("misra_analyzer"):
-                print("DEBUG: MISRA analyzer result exists, testing condition...")
-                print(f"DEBUG: MISRA result type: {type(graph_result.results.get('misra_analyzer'))}")
-                print(f"DEBUG: MISRA result content preview: {str(graph_result.results.get('misra_analyzer'))[:300]}...")
-                
-                from types import SimpleNamespace
-                mock_state = SimpleNamespace()
-                mock_state.results = graph_result.results
-                condition_result = should_generate_tests(mock_state)
-                print(f"DEBUG: Condition function returned: {condition_result}")
-            else:
-                print("DEBUG: No MISRA analyzer result found in graph results")
-        
         # Build the response structure
         result = {
-            "graph_execution": {
-                "total_nodes": graph_result.total_nodes,
-                "completed_nodes": graph_result.completed_nodes,
-                "failed_nodes": graph_result.failed_nodes,
-                "execution_time_ms": graph_result.execution_time,
-                "execution_order": [node.node_id for node in graph_result.execution_order]
-            },
+            "execution_time_ms": graph_result.execution_time,
             "step1_misra_analysis": {
                 "analysis": graph_result.results.get("misra_analyzer", {}).result if graph_result.results.get("misra_analyzer") else "No MISRA analysis performed",
                 "violations": "See analysis above for detailed violation information"
