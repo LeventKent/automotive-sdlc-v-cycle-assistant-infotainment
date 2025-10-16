@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "automotive-coding": {
+      "command": "./.venv/bin/python",
+      "args": [
+        "automotive-strands-agents-in-runtime/mcp-servers/automotive-coding-mcp/coding-server.py" 
+      ],
+      "env": {
+        "AWS_REGION": "us-west-2",
+        "FASTMCP_LOG_LEVEL": "INFO",
+        "COGNITO_CLIENT_ID": "7drknpuoaq506nf30dqhsvud8g",
+        "COGNITO_USERNAME": "testuser",
+        "COGNITO_PASSWORD": "MyPassword123!"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "analyze_c_code"
+      ],
+      "disabledTools": []
+    }
+  }
+}
