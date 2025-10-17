@@ -12,10 +12,10 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 ## Architecture
 
 ```
-┌─────────────────────┐    Condition: No HIGH    ┌─────────────────────┐
-│   MISRA Analyzer    │────severity violations───▶│  Unit Test Generator │
-│   (Entry Point)     │                          │  (Conditional Node)  │
-└─────────────────────┘                          └─────────────────────┘
+┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
+│   MISRA Analyzer    │────severity violations───▶│  Unit Test Generator│
+│   (Entry Point)     │                           │  (Conditional Node) │
+└─────────────────────┘                           └─────────────────────┘
 ```
 
 - **Node 1**: MISRA-C Compliance Analyzer - Identifies safety-critical violations (Entry Point)
@@ -23,7 +23,7 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 - **Graph Pattern**: Strands GraphBuilder with conditional edges
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Model**: Anthropic Claude Sonnet 3.7
+- **Model**: Anthropic Claude Sonnet 4.5
 
 ## Files
 
@@ -70,7 +70,6 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 1. **Prerequisites**:
    - Python 3.13+
    - AWS credentials configured
-   - Docker running
    - Amazon Bedrock AgentCore SDK access
 
 2. **Installation**:
@@ -87,6 +86,12 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
    - Set up Cognito authentication
    - Configure and deploy the agent
    - Test with sample C code
+
+5. **Adjust MCP configuration for your IDE**:
+   - Take applicable mcp.json file under `ide-support` and put it to the expected path of your IDE
+     -  For Kiro: .kiro/settings/mcp.json
+   - Set path to your local python environment in mcp.json
+   - Set Cognito client-id in mcp.json
 
 ## Sample Test Cases
 
@@ -131,5 +136,5 @@ This implementation is specifically designed for automotive software development
 
 - Extend MISRA-C rule coverage
 - Add support for additional automotive standards (ISO 26262)
-- Implement more sophisticated unit test patterns
+- Implement requirements and technical design generation, validation and their corresponding tests 
 - Add integration with automotive CI/CD pipelines
