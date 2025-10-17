@@ -177,7 +177,10 @@ class AutomotiveCodingAgent:
             raise Exception(f"Authentication failed: {str(e)}")
     
     def invoke_agent(self, c_code: str, bearer_token: Optional[str] = None) -> dict:
-        """Invoke the AgentCore runtime agent with C code for analysis"""
+        """Invoke the AgentCore runtime agent with C code for analysis
+        uses low level http requests as AgentCoreRuntime API does not support bearer tokens as of now.
+        See: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-oauth.html"""
+
         try:
             # Use provided bearer token or get one automatically
             if bearer_token:
@@ -201,7 +204,7 @@ class AutomotiveCodingAgent:
             # Set up headers
             headers = {
                 "Authorization": f"Bearer {auth_token}",
-                "X-Amzn-Trace-Id": "111", 
+                "X-Amzn-Trace-Id": "111", #dummy number, backend assigns a unique trace-id
                 "Content-Type": "application/json",
                 "X-Amzn-Bedrock-AgentCore-Runtime-Session-Id": AGENT_CONFIG["agent_session_id"]
             }
