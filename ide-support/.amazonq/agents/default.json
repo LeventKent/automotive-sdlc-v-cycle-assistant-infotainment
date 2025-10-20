@@ -1,0 +1,56 @@
+{
+  "name": "q_ide_default",
+  "description": "Default agent configuration",
+  "prompt": "",
+  "mcpServers": {
+    "automotive-coding": {
+      "command": "./.venv/bin/python",
+      "disabled": false,
+      "timeout": 120000,
+      "args": [
+        "automotive-strands-agents-in-runtime/mcp-servers/automotive-coding-mcp/coding-server.py"
+      ],
+      "env": {
+        "AWS_REGION": "us-west-2",
+        "FASTMCP_LOG_LEVEL": "INFO",
+        "COGNITO_CLIENT_ID": "7drknpuoaq506nf30dqhsvud8g",
+        "COGNITO_USERNAME": "testuser",
+        "COGNITO_PASSWORD": "MyPassword123!"
+      }
+    }
+  },
+  "tools": [
+    "fs_read",
+    "execute_bash",
+    "fs_write",
+    "report_issue",
+    "use_aws",
+    "@automotive-coding"
+  ],
+  "toolAliases": {},
+  "allowedTools": [
+    "fs_read",
+    "report_issue",
+    "use_aws",
+    "execute_bash",
+    "fs_write"
+  ],
+  "toolsSettings": {
+    "use_aws": {
+      "preset": "readOnly"
+    },
+    "execute_bash": {
+      "preset": "readOnly"
+    }
+  },
+  "resources": [
+    "file://AmazonQ.md",
+    "file://README.md",
+    "file://.amazonq/rules/**/*.md"
+  ],
+  "hooks": {
+    "agentSpawn": [],
+    "userPromptSubmit": []
+  },
+  "useLegacyMcpJson": true
+}
