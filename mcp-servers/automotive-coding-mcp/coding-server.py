@@ -34,8 +34,9 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         # Search for .bedrock_agentcore.yaml in common locations
         search_paths = [
             ".bedrock_agentcore.yaml",
-            "./automotive-strands-agents-in-runtime/.bedrock_agentcore.yaml",
             "../.bedrock_agentcore.yaml",
+            "./automotive-strands-agents-in-runtime/.bedrock_agentcore.yaml",
+            "~/dev/git/automotive-agents-in-runtime/automotive-strands-agents-in-runtime/.bedrock_agentcore.yaml"
         ]
 
         # Log current working directory for debugging
@@ -44,9 +45,10 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         
         yaml_path = None
         for path in search_paths:
-            if os.path.exists(path):
-                yaml_path = path
-                logger.info(f"Found .bedrock_agentcore.yaml at: {path}")
+            expanded_path = os.path.expanduser(path)
+            if os.path.exists(expanded_path):
+                yaml_path = expanded_path
+                logger.info(f"Found .bedrock_agentcore.yaml at: {expanded_path}")
                 break
         
         if yaml_path is None:
