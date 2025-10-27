@@ -12,7 +12,7 @@
       "env": {
         "AWS_REGION": "us-west-2",
         "FASTMCP_LOG_LEVEL": "INFO",
-        "COGNITO_CLIENT_ID": "7drknpuoaq506nf30dqhsvud8g",
+        "COGNITO_CLIENT_ID": "TODO: Replace with your COGNITO client id (see notebook or .bedrock_agentcore.yaml)",
         "COGNITO_USERNAME": "testuser",
         "COGNITO_PASSWORD": "MyPassword123!"
       }

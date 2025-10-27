@@ -65,108 +65,8 @@ def verify_misra_subset_compliance(c_code: str) -> dict:
         "compliant": len(violations) == 0
     }
 
-@tool
-def generate_unit_tests(c_code: str, function_name: str = None) -> str:
-    """
-    Generate unit tests for C code functions.
-    """
-    # Extract function signatures from C code
-    function_pattern = r"(\w+)\s+(\w+)\s*\([^)]*\)\s*{"
-    functions = re.findall(function_pattern, c_code)
-    
-    if not functions:
-        return "No functions found in the provided C code."
-    
-    unit_tests = []
-    unit_tests.append("/*")
-    unit_tests.append(" * Generated Unit Tests for Automotive C Code")
-    unit_tests.append(f" * Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    unit_tests.append(" * MISRA-C compliant unit test framework")
-    unit_tests.append(" */")
-    unit_tests.append("")
-    unit_tests.append("#include <stdio.h>")
-    unit_tests.append("#include <assert.h>")
-    unit_tests.append("#include <string.h>")
-    unit_tests.append("")
-    unit_tests.append("/* Include your source file here */")
-    unit_tests.append("/* #include \"your_source.h\" */")
-    unit_tests.append("")
-    unit_tests.append("/* Test result counters */")
-    unit_tests.append("static int tests_passed = 0;")
-    unit_tests.append("static int tests_failed = 0;")
-    unit_tests.append("")
-    unit_tests.append("/* Test assertion macro */")
-    unit_tests.append("#define ASSERT_EQ(expected, actual, test_name) \\")
-    unit_tests.append("    do { \\")
-    unit_tests.append("        if ((expected) == (actual)) { \\")
-    unit_tests.append("            printf(\"PASS: %s\\n\", test_name); \\")
-    unit_tests.append("            tests_passed++; \\")
-    unit_tests.append("        } else { \\")
-    unit_tests.append("            printf(\"FAIL: %s - Expected: %d, Got: %d\\n\", test_name, expected, actual); \\")
-    unit_tests.append("            tests_failed++; \\")
-    unit_tests.append("        } \\")
-    unit_tests.append("    } while(0)")
-    unit_tests.append("")
-    
-    for return_type, func_name in functions:
-        if function_name and func_name != function_name:
-            continue
-            
-        unit_tests.append(f"/*")
-        unit_tests.append(f" * Test function for {func_name}")
-        unit_tests.append(f" */")
-        unit_tests.append(f"void test_{func_name}(void) {{")
-        unit_tests.append(f"    printf(\"Testing {func_name}...\\n\");")
-        unit_tests.append(f"    ")
-        unit_tests.append(f"    /* Test case 1: Normal operation */")
-        unit_tests.append(f"    /* TODO: Add specific test implementation for {func_name} */")
-        unit_tests.append(f"    /* Example: ASSERT_EQ(expected_result, {func_name}(test_params), \"Normal case\"); */")
-        unit_tests.append(f"    ")
-        unit_tests.append(f"    /* Test case 2: Edge cases */")
-        unit_tests.append(f"    /* TODO: Add edge case tests for {func_name} */")
-        unit_tests.append(f"    /* Example: ASSERT_EQ(expected_edge_result, {func_name}(edge_params), \"Edge case\"); */")
-        unit_tests.append(f"    ")
-        unit_tests.append(f"    /* Test case 3: Error conditions */")
-        unit_tests.append(f"    /* TODO: Add error condition tests for {func_name} */")
-        unit_tests.append(f"    /* Example: ASSERT_EQ(-1, {func_name}(invalid_params), \"Error case\"); */")
-        unit_tests.append(f"    ")
-        unit_tests.append(f"    printf(\"{func_name} tests completed!\\n\");")
-        unit_tests.append("}")
-        unit_tests.append("")
-    
-    unit_tests.append("/*")
-    unit_tests.append(" * Main test runner")
-    unit_tests.append(" */")
-    unit_tests.append("int main(void) {")
-    unit_tests.append("    printf(\"Starting Automotive C Code Unit Tests...\\n\");")
-    unit_tests.append("    printf(\"==========================================\\n\");")
-    unit_tests.append("")
-    
-    for return_type, func_name in functions:
-        if function_name and func_name != function_name:
-            continue
-        unit_tests.append(f"    test_{func_name}();")
-    
-    unit_tests.append("")
-    unit_tests.append("    printf(\"==========================================\\n\");")
-    unit_tests.append("    printf(\"Test Summary:\\n\");")
-    unit_tests.append("    printf(\"Tests Passed: %d\\n\", tests_passed);")
-    unit_tests.append("    printf(\"Tests Failed: %d\\n\", tests_failed);")
-    unit_tests.append("    printf(\"Total Tests: %d\\n\", tests_passed + tests_failed);")
-    unit_tests.append("")
-    unit_tests.append("    if (tests_failed == 0) {")
-    unit_tests.append("        printf(\"All tests PASSED!\\n\");")
-    unit_tests.append("        return 0;")
-    unit_tests.append("    } else {")
-    unit_tests.append("        printf(\"Some tests FAILED!\\n\");")
-    unit_tests.append("        return 1;")
-    unit_tests.append("    }")
-    unit_tests.append("}")
-    
-    return "\n".join(unit_tests)
-
 # Create the model for all agents
-model_id = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+model_id = "us.anthropic.claude-haiku-4-5-20251001-v1:0" #"us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 model = BedrockModel(model_id=model_id)
 
 # Create the MISRA compliance analyzer agent
@@ -201,7 +101,7 @@ unit_test_agent = Agent(
 3. Follow automotive testing standards
 4. Create tests that are suitable for safety-critical applications
 
-Generate clean, well-documented test code that can be easily integrated into a test framework. Always use the generate_unit_tests tool to create the tests."""
+Generate clean, well-documented test code that can be easily integrated into a test framework."""
 )
 
 # Define condition function to check if unit tests should be generated
