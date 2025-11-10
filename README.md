@@ -1,6 +1,14 @@
-# Automotive C Code Analyzer with Strands Agents
+# Automotive Multi-Agent Analysis System
 
-This project implements a multi-agent system for automotive C code analysis using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication.
+This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication.
+
+## Components
+
+### 1. C Code Analyzer (Main Directory)
+Multi-agent system for automotive C code analysis with MISRA-C compliance checking and unit test generation.
+
+### 2. Requirements Analyzer (Backend Directory)
+Multi-agent system for business requirements analysis and user acceptance test generation.
 
 ## Overview
 
@@ -25,16 +33,29 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 - **Runtime**: Amazon Bedrock AgentCore Runtime
 - **Model**: Anthropic Claude Sonnet 4.5
 
-## Files
+## Project Structure
 
-- `c_code_analyzer.py` - Main agent implementation with multi-agent workflow
-- `utils.py` - Utility functions for Cognito setup and IAM role creation
-- `automotive_c_analyzer_notebook.ipynb` - Jupyter notebook with complete tutorial
-- `requirements.txt` - Python dependencies
-- `sample_automotive_code/` - Directory containing sample C code for testing
-  - `sample_with_severe_violations.c` - C code with high-severity MISRA violations
-  - `sample_with_minor_violations.c` - C code with minor MISRA violations
-  - `sample_misra_compliant.c` - MISRA-C compliant automotive code
+```
+automotive-strands-agents-in-runtime/
+├── backend/                                    # Requirements Analyzer Backend
+│   ├── automotive_requirements_agent_notebook.ipynb
+│   ├── requirements_analyzer.py
+│   ├── utils.py
+│   ├── requirements.txt
+│   └── README.md
+├── c_code_analyzer.py                          # C Code Analyzer (main directory)
+├── automotive_c_analyzer_notebook.ipynb       # C Code Analysis Tutorial
+├── utils.py                                   # Shared utilities
+├── requirements.txt                           # Main dependencies
+├── sample_automotive_code/                    # Sample C code for testing
+│   ├── sample_with_severe_violations.c
+│   ├── sample_with_minor_violations.c
+│   └── sample_misra_compliant.c
+├── requirements/weather-app/                  # Requirements documents
+│   ├── business/weather_app_brd.md
+│   └── technical/weather_app_srs.md
+└── tests/                                     # Generated test files
+    └── test_speed_calculator.c
 
 ## Key Features
 
@@ -67,6 +88,8 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 
 ## Getting Started
 
+### C Code Analyzer (Main Directory)
+
 1. **Prerequisites**:
    - Python 3.13+
    - AWS credentials configured
@@ -77,21 +100,34 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
    pip install -r requirements.txt
    ```
 
-3. **Run the Jupyter Notebook**:
+3. **Run the C Code Analysis Notebook**:
    ```bash
    jupyter notebook automotive_c_analyzer_notebook.ipynb
    ```
 
-4. **Follow the notebook steps**:
-   - Set up Cognito authentication
-   - Configure and deploy the agent
-   - Test with sample C code
+### Requirements Analyzer (Backend Directory)
 
-5. **Adjust MCP configuration for your IDE**:
-   - Take applicable mcp.json file under `ide-support` and put it to the expected path of your IDE
-     -  For Kiro: .kiro/settings/mcp.json
-   - Set path to your local python environment in mcp.json
-   - Set Cognito client-id in mcp.json
+1. **Navigate to backend**:
+   ```bash
+   cd backend
+   ```
+
+2. **Install backend dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the Requirements Analysis Notebook**:
+   ```bash
+   jupyter notebook automotive_requirements_agent_notebook.ipynb
+   ```
+
+### MCP Configuration for IDEs
+
+- Take applicable mcp.json file under `ide-support` and put it to the expected path of your IDE
+  - For Kiro: .kiro/settings/mcp.json
+- Set path to your local python environment in mcp.json
+- Set Cognito client-id in mcp.json
 
 ## Sample Test Cases
 
@@ -132,9 +168,32 @@ This implementation is specifically designed for automotive software development
 - Automotive testing standards
 - Production-ready deployment architecture
 
+## Requirements Analyzer (Backend)
+
+The backend directory contains a separate multi-agent system for business requirements analysis:
+
+### Features
+- **Business Requirements Focus**: Analyzes documents from `requirements/weather-app/business/`
+- **Consistency Analysis**: Checks for conflicting business requirements
+- **Completeness Assessment**: Identifies missing business sections
+- **User Acceptance Test Generation**: Creates business-focused test specifications
+- **Conditional Execution**: Only generates tests when quality standards are met
+
+### Architecture
+```
+┌─────────────────────────┐    Condition: No HIGH    ┌─────────────────────────────┐
+│ Requirements Consistency │────severity violations───▶│ User Acceptance Test        │
+│ Analyzer (Entry Point)  │                          │ Generator (Conditional Node)│
+└─────────────────────────┘                          └─────────────────────────────┘
+```
+
+### Usage
+See `backend/README.md` for detailed instructions on running the requirements analyzer.
+
 ## Next Steps
 
 - Extend MISRA-C rule coverage
 - Add support for additional automotive standards (ISO 26262)
-- Implement requirements and technical design generation, validation and their corresponding tests 
+- Integrate requirements and C code analysis workflows
 - Add integration with automotive CI/CD pipelines
+- Expand business requirements analysis capabilities

@@ -13,35 +13,74 @@ def setup_cognito_user_pool():
     region = boto_session.region_name
     # Initialize Cognito client
     cognito_client = boto3.client("cognito-idp", region_name=region)
+    
     try:
-        # Create User Pool
-        user_pool_response = cognito_client.create_user_pool(
-            PoolName="AutomotiveMCPServerPool", 
-            Policies={"PasswordPolicy": {"MinimumLength": 8}}
-        )
-        pool_id = user_pool_response["UserPool"]["Id"]
+        # First, try to find existing user pool
+        existing_pools = cognito_client.list_user_pools(MaxResults=50)
+        pool_id = None
+        client_id = None
         
-        # Create App Client
-        app_client_response = cognito_client.create_user_pool_client(
-            UserPoolId=pool_id,
-            ClientName="AutomotiveMCPServerPoolClient",
-            GenerateSecret=False,
-            ExplicitAuthFlows=["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"],
-        )
-        client_id = app_client_response["UserPoolClient"]["ClientId"]
+        for pool in existing_pools['UserPools']:
+            if pool['Name'] == "AutomotiveMCPServerPool":
+                pool_id = pool['Id']
+                print(f"Found existing user pool: {pool_id}")
+                
+                # Get existing app client
+                clients = cognito_client.list_user_pool_clients(
+                    UserPoolId=pool_id,
+                    MaxResults=50
+                )
+                for client in clients['UserPoolClients']:
+                    if client['ClientName'] == "AutomotiveMCPServerPoolClient":
+                        client_id = client['ClientId']
+                        print(f"Found existing app client: {client_id}")
+                        break
+                break
         
-        # Create User
-        cognito_client.admin_create_user(
-            UserPoolId=pool_id,
-            Username=USER_NAME,
-            TemporaryPassword=TEMP_ADMIN_PASSWORD,
-            MessageAction="SUPPRESS",
-        )
+        # If no existing pool found, create new one
+        if not pool_id:
+            print("Creating new user pool...")
+            user_pool_response = cognito_client.create_user_pool(
+                PoolName="AutomotiveMCPServerPool", 
+                Policies={"PasswordPolicy": {"MinimumLength": 8}}
+            )
+            pool_id = user_pool_response["UserPool"]["Id"]
+            print(f"Created new user pool: {pool_id}")
         
-        # Set Permanent Password
-        cognito_client.admin_set_user_password(
-            UserPoolId=pool_id, Username=USER_NAME, Password=PASSWORD, Permanent=True
-        )
+        # If no existing client found, create new one
+        if not client_id:
+            print("Creating new app client...")
+            app_client_response = cognito_client.create_user_pool_client(
+                UserPoolId=pool_id,
+                ClientName="AutomotiveMCPServerPoolClient",
+                GenerateSecret=False,
+                ExplicitAuthFlows=["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"],
+            )
+            client_id = app_client_response["UserPoolClient"]["ClientId"]
+            print(f"Created new app client: {client_id}")
+        
+        # Check if user exists, create if not
+        try:
+            cognito_client.admin_get_user(
+                UserPoolId=pool_id,
+                Username=USER_NAME
+            )
+            print(f"User {USER_NAME} already exists")
+        except cognito_client.exceptions.UserNotFoundException:
+            print(f"Creating user {USER_NAME}...")
+            # Create User
+            cognito_client.admin_create_user(
+                UserPoolId=pool_id,
+                Username=USER_NAME,
+                TemporaryPassword=TEMP_ADMIN_PASSWORD,
+                MessageAction="SUPPRESS",
+            )
+            
+            # Set Permanent Password
+            cognito_client.admin_set_user_password(
+                UserPoolId=pool_id, Username=USER_NAME, Password=PASSWORD, Permanent=True
+            )
+            print(f"User {USER_NAME} created successfully")
         
         # Authenticate User and get Access Token
         auth_response = cognito_client.initiate_auth(

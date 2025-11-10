@@ -38,4 +38,4 @@ COPY . .
 
 # Use the full module path
 
-CMD ["opentelemetry-instrument", "python", "-m", "c_code_analyzer"]
+CMD ["opentelemetry-instrument", "python", "-m", "requirements_analyzer"]
