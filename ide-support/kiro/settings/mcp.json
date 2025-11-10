@@ -1,20 +1,20 @@
 {
   "mcpServers": {
-    "automotive-coding": {
+    "automotive-requirements": {
       "command": "./.venv/bin/python", //path to your local python environment
       "args": [
-        "automotive-strands-agents-in-runtime/mcp-servers/automotive-coding-mcp/coding-server.py" 
+        "automotive-strands-agents-in-runtime/mcp-servers/automotive-requirements-mcp/requirements-server.py"
       ],
       "env": {
         "AWS_REGION": "us-west-2",
         "FASTMCP_LOG_LEVEL": "INFO",
-        "COGNITO_CLIENT_ID": "7drknpuoaq506nf30dqhsvud8g", // put your own cognito client id from automotive_c_analyzer_notebook here
+        "COGNITO_CLIENT_ID": "6kou4hilv45c3e2lyyyy2zzzz4", // put your own cognito client id from the notebooks here.
         "COGNITO_USERNAME": "testuser",
         "COGNITO_PASSWORD": "MyPassword123!"
       },
       "disabled": false,
       "autoApprove": [
-        "analyze_c_code"
+        "automotive_requirements_analyzer"
       ],
       "disabledTools": []
     }
