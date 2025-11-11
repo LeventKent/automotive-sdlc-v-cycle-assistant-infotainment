@@ -104,14 +104,14 @@ def get_fallback_config() -> Dict[str, Any]:
     """
     logger.info("Using fallback agent configuration")
     return {
-        "agent_id": "automotive_requirements_analyzer_inbound_auth_5",
-        "agent_arn": "arn:aws:bedrock-agentcore:us-west-2:974155583980:runtime/automotive_requirements_analyzer_inbound_auth_5",
-        "agent_session_id": "dfmeoagmreaklgmrkleafremoigrmtesogmtrskhmtkrlshmt",  # Must be 33+ chars
+        "agent_id": "automotive_requirements_analyzer_inbound_auth_xxx",
+        "agent_arn": "arn:aws:bedrock-agentcore:us-west-2:account-id:runtime/automotive_requirements_analyzer_inbound_auth_xxx",
+        "agent_session_id": "xxx",  # Must be 33+ chars
         "region": "us-west-2",
         "authorizer_configuration": {
             "customJWTAuthorizer": {
-                "discoveryUrl": "https://cognito-idp.us-west-2.amazonaws.com/us-west-2_uHl5JmxYy/.well-known/openid-configuration",
-                "allowedClients": ["1ld62cdek83ju3vtc17mrb9a1e"]
+                "discoveryUrl": "https://cognito-idp.us-west-2.amazonaws.com/us-west-2_xxx/.well-known/openid-configuration",
+                "allowedClients": ["xxx"]
             }
         }
     }

@@ -35,8 +35,10 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         search_paths = [
             ".bedrock_agentcore.yaml",
             "../.bedrock_agentcore.yaml",
-            "./automotive-strands-agents-in-runtime/.bedrock_agentcore.yaml",
-            "~/dev/git/automotive-agents-in-runtime/automotive-strands-agents-in-runtime/.bedrock_agentcore.yaml"
+            "../../backend/c-code-analyzer-agent/.bedrock_agentcore.yaml",
+            "./automotive-strands-agents-in-runtime/backend/c-code-analyzer-agent/.bedrock_agentcore.yaml",
+            "../automotive-strands-agents-in-runtime/backend/c-code-analyzer-agent/.bedrock_agentcore.yaml",
+            "~/dev/git/automotive-agents-in-runtime/automotive-strands-agents-in-runtime/backend/c-code-analyzer-agent.bedrock_agentcore.yaml"
         ]
 
         # Log current working directory for debugging
@@ -102,14 +104,14 @@ def get_fallback_config() -> Dict[str, Any]:
     """
     logger.info("Using fallback agent configuration")
     return {
-        "agent_id": "automotive_c_analyzer_inbound_auth-d9HAp15Saj",
-        "agent_arn": "arn:aws:bedrock-agentcore:us-west-2:974155583980:runtime/automotive_c_analyzer_inbound_auth-d9HAp15Saj",
-        "agent_session_id": "dfmeoagmreaklgmrkleafremoigrmtesogmtrskhmtkrlshmt",  # Must be 33+ chars
+        "agent_id": "automotive_c_analyzer_inbound_auth-xxx",
+        "agent_arn": "arn:aws:bedrock-agentcore:us-west-2:xxx:runtime/automotive_c_analyzer_inbound_auth-xxx",
+        "agent_session_id": "xxx",  # Must be 33+ chars
         "region": "us-west-2",
         "authorizer_configuration": {
             "customJWTAuthorizer": {
-                "discoveryUrl": "https://cognito-idp.us-west-2.amazonaws.com/us-west-2_uHl5JmxYy/.well-known/openid-configuration",
-                "allowedClients": ["1ld62cdek83ju3vtc17mrb9a1e"]
+                "discoveryUrl": "https://cognito-idp.us-west-2.amazonaws.com/us-west-2_xxx/.well-known/openid-configuration",
+                "allowedClients": ["xxx"]
             }
         }
     }
