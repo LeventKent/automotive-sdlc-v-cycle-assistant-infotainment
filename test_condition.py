@@ -102,27 +102,27 @@ def test_condition_function():
 
 ## Detailed Analysis
 
-The provided code was analyzed for compliance with MISRA-C:2012 rules 8.4, 21.3, 17.7, and 2.2. No violations were detected in the code.
+The provided code was analyzed for compliance with custom automotive coding standards AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, and AUTO-STYLE-001. No violations were detected in the code.
 
-### MISRA-C:2012 Rule 8.4 - Compliance
-- **Rule Description**: A compatible declaration shall be visible when an object or function with external linkage is defined.
+### AUTO-SAFE-001 - Compliance
+- **Rule Description**: External function declarations must be visible at definition point for safety traceability.
 - **Status**: COMPLIANT
 - **Analysis**: All functions and variables are properly defined with consistent declarations.
 
-### MISRA-C:2012 Rule 21.3 - Compliance
-- **Rule Description**: The memory allocation and deallocation functions shall not be used.
+### AUTO-MEM-001 - Compliance
+- **Rule Description**: Dynamic memory allocation is prohibited in safety-critical automotive systems.
 - **Status**: COMPLIANT
 - **Analysis**: The code does not use any dynamic memory allocation functions like malloc(), calloc(), realloc(), or free().
 
-### MISRA-C:2012 Rule 17.7 - Compliance
-- **Rule Description**: The value returned by a function having non-void return type shall be used.
+### AUTO-FUNC-001 - Compliance
+- **Rule Description**: Function return values must be checked for error handling in automotive systems.
 - **Status**: COMPLIANT
 - **Analysis**: All return values from functions are properly used. Additionally, the printf() function calls are properly cast to void using (void)printf(...) to explicitly indicate that the return value is intentionally ignored.
 
-### MISRA-C:2012 Rule 2.2 - Compliance
-- **Rule Description**: C++ style comments shall not be used.
+### AUTO-STYLE-001 - Compliance
+- **Rule Description**: Use C-style comments for better compiler compatibility across automotive toolchains.
 - **Status**: COMPLIANT
-- **Analysis**: The code exclusively uses C-style comments (/* ... */) and avoids C++ style comments (//), which is in compliance with MISRA-C:2012 guidelines.
+- **Analysis**: The code exclusively uses C-style comments (/* ... */) and avoids C++ style comments (//), which is in compliance with automotive coding guidelines.
 
 ## Notable Compliance Features
 
@@ -142,7 +142,7 @@ The code demonstrates excellent MISRA-C compliance through these practices:
 
 ## Conclusion
 
-This code is fully compliant with the specified MISRA-C:2012 rules (8.4, 21.3, 17.7, and 2.2). It demonstrates good coding practices for automotive safety-critical applications and is suitable for unit test generation. The code follows defensive programming practices, has clear structure, and properly handles error conditions. No modifications are required to achieve compliance with the specified subset of MISRA-C rules."""
+This code is fully compliant with the specified custom automotive coding standards (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, and AUTO-STYLE-001). It demonstrates good coding practices for automotive safety-critical applications and is suitable for unit test generation. The code follows defensive programming practices, has clear structure, and properly handles error conditions. No modifications are required to achieve compliance with the specified subset of MISRA-C rules."""
 
     test_cases = [
         {

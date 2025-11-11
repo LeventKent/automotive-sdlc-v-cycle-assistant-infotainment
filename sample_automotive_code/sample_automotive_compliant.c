@@ -1,6 +1,6 @@
 /*
- * Sample MISRA-compliant automotive C code
- * This code follows MISRA-C:2012 guidelines and should generate unit tests
+ * Sample automotive-compliant C code
+ * This code follows custom automotive coding standards and should generate unit tests
  */
 
 #include <stdio.h>

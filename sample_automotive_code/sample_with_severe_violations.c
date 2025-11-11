@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// This is a C++ style comment - MISRA-C:2012 Rule 2.2 violation
+// This is a C++ style comment - AUTO-STYLE-001 violation
 
 /*
  * Function: calculate_speed

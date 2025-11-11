@@ -5,7 +5,7 @@ This project implements multiple multi-agent systems for automotive software dev
 ## Components
 
 ### 1. C Code Analyzer (Main Directory)
-Multi-agent system for automotive C code analysis with MISRA-C compliance checking and unit test generation.
+Multi-agent system for automotive C code analysis with custom automotive coding standards compliance checking and unit test generation.
 
 ### 2. Requirements Analyzer (Backend Directory)
 Multi-agent system for business requirements analysis and user acceptance test generation.
@@ -14,19 +14,19 @@ Multi-agent system for business requirements analysis and user acceptance test g
 
 The system uses a **conditional sequential graph** pattern with 2 nodes:
 
-1. **MISRA-C Compliance Analysis**: Analyzes C code for MISRA-C compliance violations
+1. **Automotive Coding Standards Analysis**: Analyzes C code for custom automotive coding standards violations
 2. **Unit Test Generation**: If no severe violations are found, generates comprehensive unit tests
 
 ## Architecture
 
 ```
 ┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
-│   MISRA Analyzer    │────severity violations───▶│  Unit Test Generator│
+│ Automotive Analyzer │────severity violations───▶│  Unit Test Generator│
 │   (Entry Point)     │                           │  (Conditional Node) │
 └─────────────────────┘                           └─────────────────────┘
 ```
 
-- **Node 1**: MISRA-C Compliance Analyzer - Identifies safety-critical violations (Entry Point)
+- **Node 1**: Automotive Coding Standards Analyzer - Identifies safety-critical violations (Entry Point)
 - **Node 2**: Unit Test Generator - Creates automotive-grade unit tests (Conditional Execution)
 - **Graph Pattern**: Strands GraphBuilder with conditional edges
 - **Authentication**: Amazon Cognito with JWT tokens
@@ -37,9 +37,10 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 
 ```
 automotive-strands-agents-in-runtime/
-├── backend/                                    # Requirements Analyzer Backend
-│   ├── automotive_requirements_agent_notebook.ipynb
-│   ├── requirements_analyzer.py
+├── backend/                                    # Backend Services
+│   └── requirements-agent/                    # Requirements Analyzer Backend
+│       ├── automotive_requirements_agent_notebook.ipynb
+│       ├── requirements_analyzer.py
 │   ├── utils.py
 │   ├── requirements.txt
 │   └── README.md
@@ -50,7 +51,7 @@ automotive-strands-agents-in-runtime/
 ├── sample_automotive_code/                    # Sample C code for testing
 │   ├── sample_with_severe_violations.c
 │   ├── sample_with_minor_violations.c
-│   └── sample_misra_compliant.c
+│   └── sample_automotive_compliant.c
 ├── requirements/weather-app/                  # Requirements documents
 │   ├── business/weather_app_brd.md
 │   └── technical/weather_app_srs.md
@@ -65,8 +66,8 @@ automotive-strands-agents-in-runtime/
 - Automatic workflow control based on analysis results
 - Performance metrics and execution tracking
 
-### MISRA-C Compliance Checking
-- Detects common MISRA-C:2012 rule violations
+### Automotive Coding Standards Compliance Checking
+- Detects custom automotive coding standards violations
 - Categorizes violations by severity (LOW, MEDIUM, HIGH)
 - Focuses on automotive safety standards
 - Prevents unit test generation for code with severe violations
@@ -84,7 +85,7 @@ automotive-strands-agents-in-runtime/
 - Structured response with both analysis and test generation results
 - Clear separation of concerns between graph nodes
 - Execution metrics and performance tracking
-- Automatic workflow control based on MISRA violation severity
+- Automatic workflow control based on automotive coding standards violation severity
 
 ## Getting Started
 
@@ -135,16 +136,16 @@ The notebook includes three test cases using files from `sample_automotive_code/
 
 1. **Severe Violations** (`sample_with_severe_violations.c`): C code with malloc/free usage (blocks unit test generation)
 2. **Minor Violations** (`sample_with_minor_violations.c`): C code with C++ style comments (allows unit test generation)
-3. **Compliant Code** (`sample_misra_compliant.c`): MISRA-compliant C code (generates comprehensive unit tests)
+3. **Compliant Code** (`sample_automotive_compliant.c`): Automotive-compliant C code (generates comprehensive unit tests)
 
 Generated unit tests are returned as part of the agent response and can be saved manually if needed.
 
-## MISRA-C Rules Checked
+## Custom Automotive Coding Standards Checked
 
-- **Rule 2.2**: C++ style comments shall not be used
-- **Rule 8.4**: Compatible declaration visibility for external linkage
-- **Rule 17.7**: Return value usage for non-void functions
-- **Rule 21.3**: Memory allocation/deallocation functions shall not be used
+- **AUTO-STYLE-001**: Use C-style comments for better compiler compatibility across automotive toolchains
+- **AUTO-SAFE-001**: External function declarations must be visible at definition point for safety traceability
+- **AUTO-FUNC-001**: Function return values must be checked for error handling in automotive systems
+- **AUTO-MEM-001**: Dynamic memory allocation is prohibited in safety-critical automotive systems
 
 ## Security
 
@@ -164,7 +165,7 @@ The notebook includes optional cleanup code to remove:
 
 This implementation is specifically designed for automotive software development with:
 - Safety-critical code analysis
-- MISRA-C compliance checking
+- Custom automotive coding standards compliance checking
 - Automotive testing standards
 - Production-ready deployment architecture
 
@@ -188,11 +189,11 @@ The backend directory contains a separate multi-agent system for business requir
 ```
 
 ### Usage
-See `backend/README.md` for detailed instructions on running the requirements analyzer.
+See `backend/requirements-agent/README.md` for detailed instructions on running the requirements analyzer.
 
 ## Next Steps
 
-- Extend MISRA-C rule coverage
+- Extend custom automotive coding standards rule coverage
 - Add support for additional automotive standards (ISO 26262)
 - Integrate requirements and C code analysis workflows
 - Add integration with automotive CI/CD pipelines

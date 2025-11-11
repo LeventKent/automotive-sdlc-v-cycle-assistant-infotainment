@@ -8,41 +8,41 @@ from datetime import datetime
 
 app = BedrockAgentCoreApp()
 
-# MISRA-C compliance analyzer tool
+# Automotive coding standards compliance analyzer tool
 @tool
-def verify_misra_subset_compliance(c_code: str) -> dict:
+def verify_automotive_coding_compliance(c_code: str) -> dict:
     """
-    Analyze C code for MISRA-C compliance violations ONLY for the rules 8.4, 21.3, 17.7 and 2.2.
+    Analyze C code for custom automotive coding standards compliance.
     Returns a dictionary with violation severity and details.
     """
     violations = []
     severity_level = "LOW"
     
-    # Basic MISRA-C rule checks (simplified for demo)
-    misra_rules = {
-        "MISRA-C:2012 Rule 8.4": {
+    # Custom automotive coding rules (safety-focused)
+    automotive_rules = {
+        "AUTO-SAFE-001": {
             "pattern": r"extern\s+\w+\s+\w+\s*\(",
-            "description": "A compatible declaration shall be visible when an object or function with external linkage is defined",
+            "description": "External function declarations must be visible at definition point for safety traceability",
             "severity": "MEDIUM"
         },
-        "MISRA-C:2012 Rule 21.3": {
+        "AUTO-MEM-001": {
             "pattern": r"\bmalloc\b|\bcalloc\b|\brealloc\b|\bfree\b",
-            "description": "The memory allocation and deallocation functions shall not be used",
+            "description": "Dynamic memory allocation is prohibited in safety-critical automotive systems",
             "severity": "HIGH"
         },
-        "MISRA-C:2012 Rule 17.7": {
+        "AUTO-FUNC-001": {
             "pattern": r"^\s*\w+\s*\([^)]*\)\s*;",
-            "description": "The value returned by a function having non-void return type shall be used",
+            "description": "Function return values must be checked for error handling in automotive systems",
             "severity": "MEDIUM"
         },
-        "MISRA-C:2012 Rule 2.2": {
+        "AUTO-STYLE-001": {
             "pattern": r"//.*",
-            "description": "C++ style comments shall not be used",
+            "description": "Use C-style comments for better compiler compatibility across automotive toolchains",
             "severity": "LOW"
         }
     }
     
-    for rule_id, rule_info in misra_rules.items():
+    for rule_id, rule_info in automotive_rules.items():
         matches = re.findall(rule_info["pattern"], c_code, re.MULTILINE)
         if matches:
             violations.append({
@@ -69,18 +69,18 @@ def verify_misra_subset_compliance(c_code: str) -> dict:
 model_id = "us.anthropic.claude-haiku-4-5-20251001-v1:0" #"us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 model = BedrockModel(model_id=model_id)
 
-# Create the MISRA compliance analyzer agent
-misra_analyzer_agent = Agent(
-    name="misra_analyzer",
+# Create the automotive coding standards analyzer agent
+automotive_analyzer_agent = Agent(
+    name="automotive_analyzer",
     model=model,
-    tools=[verify_misra_subset_compliance],
-    system_prompt="""You are a MISRA-C compliance analyzer for automotive software. Your job is to:
-1. Analyze C code for MISRA-C compliance violations (Rules 8.4, 21.3, 17.7, and 2.2)
+    tools=[verify_automotive_coding_compliance],
+    system_prompt="""You are an automotive coding standards analyzer for safety-critical software. Your job is to:
+1. Analyze C code for custom automotive coding standards violations (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
 2. Identify the severity of violations (LOW, MEDIUM, HIGH)
 3. Provide detailed explanations of violations found
 4. Pass your analysis results to the next stage in the workflow
 
-IMPORTANT: Always use the verify_misra_subset_compliance tool to analyze the code first, then provide your analysis.
+IMPORTANT: Always use the verify_automotive_coding_compliance tool to analyze the code first, then provide your analysis.
 
 In your response, clearly state:
 - Overall Severity: [LOW/MEDIUM/HIGH]
@@ -108,19 +108,19 @@ Generate clean, well-documented test code that can be easily integrated into a t
 def should_generate_tests(state):
     """
     Condition function to determine if unit tests should be generated
-    based on MISRA analysis results.
+    based on automotive coding standards analysis results.
     """
-    misra_result = state.results.get("misra_analyzer")
-    if not misra_result:
-        print("DEBUG: No MISRA analyzer result found")
+    automotive_result = state.results.get("automotive_analyzer")
+    if not automotive_result:
+        print("DEBUG: No automotive analyzer result found")
         return False
     
     # Extract the analysis result from the agent's response
-    # The misra_result is an AgentResult object, we need to access its .result attribute
-    if hasattr(misra_result, 'result'):
-        result_text = str(misra_result.result).lower()
+    # The automotive_result is an AgentResult object, we need to access its .result attribute
+    if hasattr(automotive_result, 'result'):
+        result_text = str(automotive_result.result).lower()
     else:
-        result_text = str(misra_result).lower()
+        result_text = str(automotive_result).lower()
 
     
     # Simple approach: Look for HIGH severity violations that should block unit test generation
@@ -153,14 +153,14 @@ def build_automotive_analyzer_graph():
     builder = GraphBuilder()
     
     # Add nodes to the graph
-    builder.add_node(misra_analyzer_agent, "misra_analyzer")
+    builder.add_node(automotive_analyzer_agent, "automotive_analyzer")
     builder.add_node(unit_test_agent, "unit_test_generator")
     
     # Add conditional edge: only generate tests if no severe violations
-    builder.add_edge("misra_analyzer", "unit_test_generator", condition=should_generate_tests)
+    builder.add_edge("automotive_analyzer", "unit_test_generator", condition=should_generate_tests)
     
     # Set entry point
-    builder.set_entry_point("misra_analyzer")
+    builder.set_entry_point("automotive_analyzer")
     
     # Build and return the graph
     return builder.build()
@@ -171,7 +171,7 @@ automotive_graph = build_automotive_analyzer_graph()
 @app.entrypoint
 def automotive_c_analyzer(payload):
     """
-    Multi-step automotive C code analyzer using agent graph with MISRA compliance check and conditional unit test generation.
+    Multi-step automotive C code analyzer using agent graph with custom coding standards check and conditional unit test generation.
     """
     c_code = payload.get("c_code", "")
     if not c_code:
@@ -180,11 +180,11 @@ def automotive_c_analyzer(payload):
     print(f"Analyzing C code: {c_code[:100]}...")
     
     # Create the analysis prompt
-    analysis_prompt = f"""Analyze this automotive C code for MISRA-C compliance violations and provide detailed feedback:
+    analysis_prompt = f"""Analyze this automotive C code for custom automotive coding standards violations and provide detailed feedback:
 
 {c_code}
 
-Please use the verify_misra_subset_compliance tool to analyze the code and provide a comprehensive report on any violations found."""
+Please use the verify_automotive_coding_compliance tool to analyze the code and provide a comprehensive report on any violations found."""
     
     # Execute the multi-agent graph
     try:
@@ -196,8 +196,8 @@ Please use the verify_misra_subset_compliance tool to analyze the code and provi
         # Build the response structure
         result = {
             "execution_time_ms": graph_result.execution_time,
-            "step1_misra_analysis": {
-                "analysis": graph_result.results.get("misra_analyzer", {}).result if graph_result.results.get("misra_analyzer") else "No MISRA analysis performed",
+            "step1_automotive_analysis": {
+                "analysis": graph_result.results.get("automotive_analyzer", {}).result if graph_result.results.get("automotive_analyzer") else "No automotive standards analysis performed",
                 "violations": "See analysis above for detailed violation information"
             }
         }
@@ -212,7 +212,7 @@ Please use the verify_misra_subset_compliance tool to analyze the code and provi
         else:
             result["step2_unit_tests"] = {
                 "generated": False,
-                "reason": "Unit test generation was skipped due to severe MISRA-C violations or analysis failure."
+                "reason": "Unit test generation was skipped due to severe automotive coding standards violations or analysis failure."
             }
             print("Unit test generation was skipped.")
         
@@ -223,7 +223,7 @@ Please use the verify_misra_subset_compliance tool to analyze the code and provi
         print(f"Error during graph execution: {e}")
         return {
             "error": f"Graph execution failed: {str(e)}",
-            "step1_misra_analysis": {"analysis": "Analysis failed", "violations": []},
+            "step1_automotive_analysis": {"analysis": "Analysis failed", "violations": []},
             "step2_unit_tests": {"generated": False, "reason": "Analysis failed"}
         }
 

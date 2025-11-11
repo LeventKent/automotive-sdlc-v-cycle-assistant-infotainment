@@ -15,7 +15,7 @@ def test_condition_function():
     
     class MockState:
         def __init__(self, result_text):
-            self.results = {"misra_analyzer": MockResult(result_text)}
+            self.results = {"automotive_analyzer": MockResult(result_text)}
     
     # Test cases
     test_cases = [
@@ -54,7 +54,7 @@ def test_graph_structure():
     compliant_code = """
 #include <stdio.h>
 
-/* MISRA-compliant C style comment */
+/* Automotive-compliant C style comment */
 int calculate_speed(int distance, int time) {
     int result;
     if (time == 0) {
@@ -72,11 +72,11 @@ int main(void) {
 }
 """
     
-    print("\nTesting graph with MISRA-compliant code...")
+    print("\nTesting graph with automotive-compliant code...")
     print("=" * 50)
     
     try:
-        result = automotive_graph(f"Analyze this C code for MISRA-C compliance:\n\n{compliant_code}")
+        result = automotive_graph(f"Analyze this C code for automotive coding standards compliance:\n\n{compliant_code}")
         
         print(f"Graph execution completed!")
         print(f"Total nodes: {result.total_nodes}")

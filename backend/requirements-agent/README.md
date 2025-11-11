@@ -34,11 +34,12 @@ The notebook and analyzer are configured to work from the backend directory with
 
 ```
 automotive-strands-agents-in-runtime/
-├── backend/                                    # Backend implementation (current directory)
-│   ├── automotive_requirements_agent_notebook.ipynb
-│   ├── requirements_analyzer.py
-│   ├── utils.py
-│   └── requirements.txt
+├── backend/                                    # Backend Services
+│   └── requirements-agent/                    # Requirements Analyzer Backend (current directory)
+│       ├── automotive_requirements_agent_notebook.ipynb
+│       ├── requirements_analyzer.py
+│       ├── utils.py
+│       └── requirements.txt
 ├── requirements/weather-app/business/          # Business requirements documents
 │   └── weather_app_brd.md
 └── requirements/weather-app/technical/         # Technical requirements documents

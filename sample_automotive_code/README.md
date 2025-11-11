@@ -7,19 +7,19 @@ This directory contains sample C code files for testing the automotive MISRA-C a
 ### Input Files (C Code Samples)
 
 1. **`sample_with_severe_violations.c`**
-   - Contains high-severity MISRA-C violations
-   - Includes malloc/free usage (Rule 21.3)
+   - Contains high-severity automotive coding standards violations
+   - Includes malloc/free usage (AUTO-MEM-001)
    - Should block unit test generation
    - Used to demonstrate severe violation handling
 
 2. **`sample_with_minor_violations.c`**
-   - Contains only minor MISRA-C violations
-   - Includes C++ style comments (Rule 2.2)
+   - Contains only minor automotive coding standards violations
+   - Includes C++ style comments (AUTO-STYLE-001)
    - Should allow unit test generation
    - Used to demonstrate conditional workflow
 
-3. **`sample_misra_compliant.c`**
-   - Fully MISRA-C:2012 compliant code
+3. **`sample_automotive_compliant.c`**
+   - Fully compliant with custom automotive coding standards
    - Uses proper C-style comments
    - Follows automotive coding standards
    - Should generate comprehensive unit tests
@@ -32,12 +32,12 @@ Unit tests are generated as response content when MISRA analysis passes (no seve
 - MISRA-C compliant test code structure
 - Ready-to-compile C test files
 
-## MISRA-C Rules Demonstrated
+## Custom Automotive Coding Standards Demonstrated
 
-- **Rule 2.2**: C++ style comments shall not be used
-- **Rule 8.4**: Compatible declaration visibility for external linkage
-- **Rule 17.7**: Return value usage for non-void functions
-- **Rule 21.3**: Memory allocation/deallocation functions shall not be used
+- **AUTO-STYLE-001**: Use C-style comments for better compiler compatibility across automotive toolchains
+- **AUTO-SAFE-001**: External function declarations must be visible at definition point for safety traceability
+- **AUTO-FUNC-001**: Function return values must be checked for error handling in automotive systems
+- **AUTO-MEM-001**: Dynamic memory allocation is prohibited in safety-critical automotive systems
 
 ## Usage
 

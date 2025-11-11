@@ -252,27 +252,27 @@ def analyze_c_code(
     c_code: str
 ) -> str:
     """
-    Analyze C code for MISRA-C compliance and generates unit tests if there are no severe violations.
+    Analyze C code for custom automotive coding standards compliance and generates unit tests if there are no severe violations.
     
     This tool implements a multi-step automotive C code analyzer using agent graph with:
-    1. MISRA-C compliance check (Rules 8.4, 21.3, 17.7, and 2.2)
+    1. Custom automotive coding standards compliance check (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
     2. Conditional unit test generation (only if no severe violations found)
     
     Authentication is handled automatically using Cognito credentials from environment variables.
     
     Args:
-        c_code: The C code to analyze for MISRA-C compliance and unit test generation
+        c_code: The C code to analyze for automotive coding standards compliance and unit test generation
     
     Returns:
         JSON string containing:
         - Graph execution metrics
-        - MISRA-C compliance analysis results
+        - Automotive coding standards compliance analysis results
         - Unit test generation results (if applicable)
     """
     if not c_code.strip():
         return json.dumps({
             "error": "No C code provided for analysis",
-            "step1_misra_analysis": {"analysis": "No code provided", "violations": []},
+            "step1_automotive_analysis": {"analysis": "No code provided", "violations": []},
             "step2_unit_tests": {"generated": False, "reason": "No code provided"}
         })
     
@@ -286,7 +286,7 @@ def analyze_c_code(
     except Exception as e:
         error_result = {
             "error": f"Analysis failed: {str(e)}",
-            "step1_misra_analysis": {"analysis": "Analysis failed", "violations": []},
+            "step1_automotive_analysis": {"analysis": "Analysis failed", "violations": []},
             "step2_unit_tests": {"generated": False, "reason": "Analysis failed"}
         }
         return json.dumps(error_result, indent=2)
