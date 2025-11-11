@@ -1,24 +1,44 @@
 # Automotive Multi-Agent Analysis System
 
-This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication.
+This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication, plus Model Context Protocol (MCP) servers for IDE integration.
 
 ## Components
 
-### 1. C Code Analyzer (Main Directory)
+### 1. C Code Analyzer Agent
 Multi-agent system for automotive C code analysis with custom automotive coding standards compliance checking and unit test generation.
 
-### 2. Requirements Analyzer (Backend Directory)
-Multi-agent system for business requirements analysis and user acceptance test generation.
+**Key Features:**
+- Analyzes C code for custom automotive coding standards violations (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
+- Categorizes violations by severity (LOW, MEDIUM, HIGH)
+- Conditionally generates comprehensive unit tests for compliant code
+- Includes edge cases, boundary conditions, and automotive testing standards
 
-## Overview
+**Location:** `backend/c-code-analyzer-agent/`  
+**MCP Server:** `mcp-servers/automotive-coding-mcp/`  
+**Documentation:** See [C Code Analyzer README](backend/c-code-analyzer-agent/README.md) for detailed setup and usage instructions.
 
-The system uses a **conditional sequential graph** pattern with 2 nodes:
+### 2. Requirements Analyzer Agent  
+Multi-agent system for business and technical requirements analysis with user acceptance test generation.
 
-1. **Automotive Coding Standards Analysis**: Analyzes C code for custom automotive coding standards violations
-2. **Unit Test Generation**: If no severe violations are found, generates comprehensive unit tests
+**Key Features:**
+- Analyzes business requirements documents for consistency and completeness
+- Checks for conflicting requirements and missing sections
+- Generates comprehensive user acceptance test specifications
+- Supports IEEE 830 standards and automotive requirements workflows
+
+**Location:** `backend/requirements-agent/`  
+**MCP Server:** `mcp-servers/automotive-requirements-mcp/`  
+**Documentation:** See [Requirements Analyzer README](backend/requirements-agent/README.md) for detailed setup and usage instructions.
+
+### 3. IDE Integration Support
+MCP servers and configuration files for seamless IDE integration with Kiro, Cline, and Amazon Q.
+- **Location**: `ide-support/`
 
 ## Architecture
 
+Both agents use a **conditional sequential graph** pattern with 2 nodes:
+
+### C Code Analyzer
 ```
 ┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
 │ Automotive Analyzer │────severity violations───▶│  Unit Test Generator│
@@ -26,175 +46,212 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 └─────────────────────┘                           └─────────────────────┘
 ```
 
-- **Node 1**: Automotive Coding Standards Analyzer - Identifies safety-critical violations (Entry Point)
-- **Node 2**: Unit Test Generator - Creates automotive-grade unit tests (Conditional Execution)
+### Requirements Analyzer
+```
+┌─────────────────────────┐                          ┌─────────────────────────────┐
+│ Requirements Consistency│─────────────────────────▶│ User Acceptance Test        │
+│ Analyzer (Entry Point)  │                          │ Generator                   │
+└─────────────────────────┘                          └─────────────────────────────┘
+```
+
+**Technical Stack:**
 - **Graph Pattern**: Strands GraphBuilder with conditional edges
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Model**: Anthropic Claude Sonnet 4.5
+- **Model**: Anthropic Claude Haiku 4.5
+- **IDE Integration**: Model Context Protocol (MCP) servers
 
 ## Project Structure
 
 ```
 automotive-strands-agents-in-runtime/
-├── backend/                                    # Backend Services
-│   └── requirements-agent/                    # Requirements Analyzer Backend
+├── backend/                                    # Backend Agent Services
+│   ├── c-code-analyzer-agent/                 # C Code Analysis Agent
+│   │   ├── sample_automotive_code/            # Sample C code for testing
+│   │   │   ├── tests/                         # Generated unit tests
+│   │   │   │   ├── test_sample_with_minor_violations.c
+│   │   │   │   ├── Makefile
+│   │   │   │   └── README.md
+│   │   │   ├── sample_with_severe_violations.c
+│   │   │   ├── sample_with_minor_violations.c
+│   │   │   ├── sample_automotive_compliant.c
+│   │   │   └── README.md
+│   │   ├── automotive_c_analyzer_notebook.ipynb
+│   │   ├── c_code_analyzer.py
+│   │   ├── utils.py
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   └── requirements-agent/                    # Requirements Analysis Agent
 │       ├── automotive_requirements_agent_notebook.ipynb
 │       ├── requirements_analyzer.py
-│   ├── utils.py
-│   ├── requirements.txt
-│   └── README.md
-├── c_code_analyzer.py                          # C Code Analyzer (main directory)
-├── automotive_c_analyzer_notebook.ipynb       # C Code Analysis Tutorial
-├── utils.py                                   # Shared utilities
-├── requirements.txt                           # Main dependencies
-├── sample_automotive_code/                    # Sample C code for testing
-│   ├── sample_with_severe_violations.c
-│   ├── sample_with_minor_violations.c
-│   └── sample_automotive_compliant.c
-├── requirements/weather-app/                  # Requirements documents
-│   ├── business/weather_app_brd.md
-│   └── technical/weather_app_srs.md
-└── tests/                                     # Generated test files
-    └── test_speed_calculator.c
+│       ├── utils.py
+│       ├── requirements.txt
+│       ├── Dockerfile
+│       └── README.md
+├── mcp-servers/                               # Model Context Protocol Servers
+│   ├── automotive-coding-mcp/                 # C Code Analysis MCP Server
+│   │   ├── coding-server.py
+│   │   ├── requirements.txt
+│   │   └── test_config.py
+│   └── automotive-requirements-mcp/           # Requirements Analysis MCP Server
+│       ├── requirements-server.py
+│       ├── requirements.txt
+│       ├── test_config.py
+│       └── README.md
+├── ide-support/                               # IDE Integration Support
+│   ├── kiro/                                  # Kiro IDE Configuration
+│   │   ├── settings/mcp.json                  # MCP server configuration
+│   │   └── steering/                          # Agent steering rules
+│   ├── cline/                                 # Cline IDE Configuration
+│   │   └── cline_mcp_settings.json
+│   └── .amazonq/                              # Amazon Q Configuration
+│       └── agents/
+└── weather-app/                               # Sample Requirements Documents
+    ├── business-requirements/
+    │   └── weather_app_brd.md
+    └── technical-requirements/
+        ├── weather_app_srs.md
+        └── ieee_830_srs_outline.md
 
 ## Key Features
 
 ### Graph-Based Multi-Agent System
 - Uses Strands GraphBuilder for agent orchestration
-- Conditional sequential execution pattern
+- Conditional sequential execution pattern with 2-node architecture
 - Automatic workflow control based on analysis results
 - Performance metrics and execution tracking
+- Structured responses with both analysis and generation results
 
-### Automotive Coding Standards Compliance Checking
-- Detects custom automotive coding standards violations
-- Categorizes violations by severity (LOW, MEDIUM, HIGH)
-- Focuses on automotive safety standards
-- Prevents unit test generation for code with severe violations
-
-### Unit Test Generation
-- Generates comprehensive unit tests for C functions
-- Includes edge cases and boundary conditions
-- Follows automotive testing standards
-- Creates tests suitable for safety-critical applications
-- Returns generated tests as response content
-- Includes test result tracking and assertion macros
-
-### Multi-Agent Graph Workflow
-- Conditional execution based on compliance analysis results using GraphBuilder
-- Structured response with both analysis and test generation results
-- Clear separation of concerns between graph nodes
-- Execution metrics and performance tracking
-- Automatic workflow control based on automotive coding standards violation severity
+### IDE Integration via MCP
+- Real-time analysis directly in your IDE (Kiro, Cline, Amazon Q)
+- Automated unit test and UAT generation on-demand
+- Continuous automotive coding standards compliance checking
+- Seamless integration with development workflows
 
 ## Getting Started
 
-### C Code Analyzer (Main Directory)
+### Prerequisites
+- Python 3.13+
+- AWS credentials configured
+- Amazon Bedrock AgentCore SDK access
+- UV package manager (for MCP servers): `pip install uv`
 
-1. **Prerequisites**:
-   - Python 3.13+
-   - AWS credentials configured
-   - Amazon Bedrock AgentCore SDK access
+### C Code Analyzer Agent
 
-2. **Installation**:
+The C Code Analyzer provides automotive C code analysis with custom coding standards compliance checking and automated unit test generation.
+
+**Quick Start:**
+```bash
+cd backend/c-code-analyzer-agent
+pip install -r requirements.txt
+jupyter notebook automotive_c_analyzer_notebook.ipynb
+```
+
+For detailed setup instructions, sample test cases, and advanced usage, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
+
+### Requirements Analyzer Agent
+
+The Requirements Analyzer focuses on business and technical requirements analysis with user acceptance test generation.
+
+**Quick Start:**
+```bash
+cd backend/requirements-agent
+pip install -r requirements.txt
+jupyter notebook automotive_requirements_agent_notebook.ipynb
+```
+
+For detailed setup instructions, path configuration, and troubleshooting, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
+
+### MCP Server Integration for IDEs
+
+#### Kiro IDE Setup
+1. Copy MCP configuration:
    ```bash
-   pip install -r requirements.txt
+   cp ide-support/kiro/settings/mcp.json .kiro/settings/mcp.json
    ```
+2. Update the configuration with your Python environment path and Cognito client-id
+3. Restart Kiro to load the MCP servers
 
-3. **Run the C Code Analysis Notebook**:
+#### Cline IDE Setup
+1. Copy MCP configuration:
    ```bash
-   jupyter notebook automotive_c_analyzer_notebook.ipynb
+   cp ide-support/cline/cline_mcp_settings.json ~/.cline/mcp_settings.json
    ```
+2. Update paths and credentials as needed
 
-### Requirements Analyzer (Backend Directory)
-
-1. **Navigate to backend**:
-   ```bash
-   cd backend
-   ```
-
-2. **Install backend dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Requirements Analysis Notebook**:
-   ```bash
-   jupyter notebook automotive_requirements_agent_notebook.ipynb
-   ```
-
-### MCP Configuration for IDEs
-
-- Take applicable mcp.json file under `ide-support` and put it to the expected path of your IDE
-  - For Kiro: .kiro/settings/mcp.json
-- Set path to your local python environment in mcp.json
-- Set Cognito client-id in mcp.json
+#### Available MCP Tools
+- `mcp_automotive_coding_analyze_c_code` - Analyze C code for automotive standards
+- `mcp_automotive_requirements_automotive_requirements_analyzer` - Analyze requirements documents
 
 ## Sample Test Cases
 
-The notebook includes three test cases using files from `sample_automotive_code/`:
+### C Code Analysis
+The C Code Analyzer includes sample automotive C code with varying levels of compliance violations. For detailed information about test cases, generated unit tests, and automotive coding standards, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
 
-1. **Severe Violations** (`sample_with_severe_violations.c`): C code with malloc/free usage (blocks unit test generation)
-2. **Minor Violations** (`sample_with_minor_violations.c`): C code with C++ style comments (allows unit test generation)
-3. **Compliant Code** (`sample_automotive_compliant.c`): Automotive-compliant C code (generates comprehensive unit tests)
+### Requirements Analysis  
+The Requirements Analyzer works with sample business and technical requirements documents located in `weather-app/`. For detailed information about requirements analysis workflows and test case generation, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
 
-Generated unit tests are returned as part of the agent response and can be saved manually if needed.
+## Security & Deployment
 
-## Custom Automotive Coding Standards Checked
-
-- **AUTO-STYLE-001**: Use C-style comments for better compiler compatibility across automotive toolchains
-- **AUTO-SAFE-001**: External function declarations must be visible at definition point for safety traceability
-- **AUTO-FUNC-001**: Function return values must be checked for error handling in automotive systems
-- **AUTO-MEM-001**: Dynamic memory allocation is prohibited in safety-critical automotive systems
-
-## Security
-
-- Inbound authentication using Amazon Cognito
-- JWT token validation
-- IAM role-based permissions
-- Secure deployment on AgentCore Runtime
-
-## Cleanup
-
-The notebook includes optional cleanup code to remove:
-- AgentCore Runtime instances
-- ECR repositories
-- IAM roles (manual cleanup may be required)
+- **Authentication**: Amazon Cognito with JWT token validation
+- **Permissions**: IAM role-based access control
+- **Runtime**: Secure deployment on Amazon Bedrock AgentCore Runtime
+- **Cleanup**: Optional cleanup procedures for AgentCore instances, ECR repositories, and IAM roles
 
 ## Automotive Focus
 
-This implementation is specifically designed for automotive software development with:
-- Safety-critical code analysis
-- Custom automotive coding standards compliance checking
-- Automotive testing standards
+This system is specifically designed for automotive software development with:
+- Safety-critical code analysis and testing standards
+- Custom automotive coding standards compliance (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
 - Production-ready deployment architecture
+- Integration with automotive development workflows
 
-## Requirements Analyzer (Backend)
+## MCP Server Integration
 
-The backend directory contains a separate multi-agent system for business requirements analysis:
+### Model Context Protocol (MCP) Servers
+The project includes MCP servers for seamless IDE integration:
 
-### Features
-- **Business Requirements Focus**: Analyzes documents from `requirements/weather-app/business/`
-- **Consistency Analysis**: Checks for conflicting business requirements
-- **Completeness Assessment**: Identifies missing business sections
-- **User Acceptance Test Generation**: Creates business-focused test specifications
-- **Conditional Execution**: Only generates tests when quality standards are met
+#### Automotive Coding MCP Server
+- **Location**: `mcp-servers/automotive-coding-mcp/`
+- **Function**: `mcp_automotive_coding_analyze_c_code`
+- **Purpose**: Analyze C code for automotive standards compliance and generate unit tests
+- **Usage**: Integrated into IDEs via MCP protocol
 
-### Architecture
+#### Automotive Requirements MCP Server  
+- **Location**: `mcp-servers/automotive-requirements-mcp/`
+- **Function**: `mcp_automotive_requirements_automotive_requirements_analyzer`
+- **Purpose**: Analyze requirements documents and generate user acceptance tests
+- **Usage**: Integrated into IDEs via MCP protocol
+
+### IDE Support
+- **Kiro**: Full MCP integration with steering rules and settings
+- **Cline**: MCP configuration for automotive analysis tools
+- **Amazon Q**: Agent configuration for automotive workflows
+
+### Benefits of MCP Integration
+- **Real-time Analysis**: Analyze code and requirements directly in your IDE
+- **Automated Testing**: Generate unit tests and UATs on-demand
+- **Standards Compliance**: Continuous automotive coding standards checking
+- **Workflow Integration**: Seamless integration with development workflows
+
+## Development Workflow
+
+### Using MCP Tools in IDEs
+1. **Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` in your IDE to analyze C code
+2. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` for requirements documents
+
+### Testing Your Setup
+```bash
+# Test C Code Analysis MCP Server
+cd mcp-servers/automotive-coding-mcp
+python test_config.py
+
+# Test Requirements Analysis MCP Server  
+cd mcp-servers/automotive-requirements-mcp
+python test_config.py
 ```
-┌─────────────────────────┐    Condition: No HIGH    ┌─────────────────────────────┐
-│ Requirements Consistency │────severity violations───▶│ User Acceptance Test        │
-│ Analyzer (Entry Point)  │                          │ Generator (Conditional Node)│
-└─────────────────────────┘                          └─────────────────────────────┘
-```
-
-### Usage
-See `backend/requirements-agent/README.md` for detailed instructions on running the requirements analyzer.
 
 ## Next Steps
 
-- Extend custom automotive coding standards rule coverage
-- Add support for additional automotive standards (ISO 26262)
-- Integrate requirements and C code analysis workflows
-- Add integration with automotive CI/CD pipelines
-- Expand business requirements analysis capabilities
+- **Technical Design Coverage**: Generate/validate technical designs based on requirements
+- **Anroid Code Generation Coverage**: Generate code/unit tests for Android. Validate via simulator

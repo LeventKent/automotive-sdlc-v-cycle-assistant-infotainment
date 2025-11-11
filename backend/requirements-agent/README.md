@@ -18,15 +18,17 @@ This folder contains the backend implementation of the automotive requirements a
    cd automotive-strands-agents-in-runtime/backend
    ```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Start Jupyter:
+2. Run steps in the Jupyter Notebook:
    ```bash
    jupyter notebook automotive_requirements_agent_notebook.ipynb
    ```
+   Execute the notebook cells (automatically installs dependencies from requirements.txt)
+
+3. Copy MCP configuration for requirements-agent (if not done already):
+   ```bash
+   cp ide-support/kiro/settings/mcp.json .kiro/settings/mcp.json
+   ```
+4. Validate in Kiro that the MCP server automotive-requirements is running correctly.
 
 ### Path Configuration
 
@@ -48,7 +50,7 @@ automotive-strands-agents-in-runtime/
 
 ### Key Features
 
-1. **Business Requirements Focus**: Analyzes documents from `../requirements/weather-app/business/`
+1. **Business Requirements Focus**: Analyzes documents from `../weather-app/business-requirements/`
 2. **Multi-Agent Architecture**: Uses Strands agents with conditional execution
 3. **AgentCore Runtime**: Deploys to Amazon Bedrock AgentCore Runtime
 4. **Authentication**: Integrated with Amazon Cognito for secure access
