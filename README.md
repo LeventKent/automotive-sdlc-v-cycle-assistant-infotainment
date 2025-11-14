@@ -4,20 +4,7 @@ This project implements multiple multi-agent systems for automotive software dev
 
 ## Components
 
-### 1. C Code Analyzer Agent
-Multi-agent system for automotive C code analysis with custom automotive coding standards compliance checking and unit test generation.
-
-**Key Features:**
-- Analyzes C code for custom automotive coding standards violations (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
-- Categorizes violations by severity (LOW, MEDIUM, HIGH)
-- Conditionally generates comprehensive unit tests for compliant code
-- Includes edge cases, boundary conditions, and automotive testing standards
-
-**Location:** `backend/c-code-analyzer-agent/`  
-**MCP Server:** `mcp-servers/automotive-coding-mcp/`  
-**Documentation:** See [C Code Analyzer README](backend/c-code-analyzer-agent/README.md) for detailed setup and usage instructions.
-
-### 2. Requirements Analyzer Agent  
+### 1. Requirements Analyzer Agent  
 Multi-agent system for business and technical requirements analysis with user acceptance test generation.
 
 **Key Features:**
@@ -30,21 +17,54 @@ Multi-agent system for business and technical requirements analysis with user ac
 **MCP Server:** `mcp-servers/automotive-requirements-mcp/`  
 **Documentation:** See [Requirements Analyzer README](backend/requirements-agent/README.md) for detailed setup and usage instructions.
 
-### 3. IDE Integration Support
+### 2. Software Design Agent
+Multi-agent system that transforms validated requirements into comprehensive technical design documents for automotive software development.
+
+**Key Features:**
+- Generates technical design documents from validated requirements
+- Validates design completeness with severity-based analysis (LOW, MEDIUM, HIGH)
+- Conditionally validates design quality when completeness criteria are met
+- Ensures alignment with automotive safety standards (ISO 26262, UNECE WP.29)
+- Includes architecture diagrams, component specifications, interface definitions, and data models
+
+**Location:** `backend/design-agent/`  
+**MCP Server:** `mcp-servers/automotive-design-mcp/`  
+**Documentation:** See [Software Design Agent README](backend/design-agent/README.md) for detailed setup and usage instructions.
+
+### 3. C Code Analyzer Agent
+Multi-agent system for automotive C code analysis with custom automotive coding standards compliance checking and unit test generation.
+
+**Key Features:**
+- Analyzes C code for custom automotive coding standards violations (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
+- Categorizes violations by severity (LOW, MEDIUM, HIGH)
+- Conditionally generates comprehensive unit tests for compliant code
+- Includes edge cases, boundary conditions, and automotive testing standards
+
+**Location:** `backend/c-code-analyzer-agent/`  
+**MCP Server:** `mcp-servers/automotive-coding-mcp/`  
+**Documentation:** See [C Code Analyzer README](backend/c-code-analyzer-agent/README.md) for detailed setup and usage instructions.
+
+### 4. IDE Integration Support
 MCP servers and configuration files for seamless IDE integration with Kiro, Cline, and Amazon Q.
 - **Location**: `ide-support/`
 
 ## Architecture
 
-Both agents use a **conditional sequential graph** pattern with 2 nodes:
+### Three-Agent Workflow
 
-### C Code Analyzer
+The system implements a complete requirements-to-code workflow with three specialized agents:
+
 ```
-┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
-│ Automotive Analyzer │────severity violations───▶│  Unit Test Generator│
-│   (Entry Point)     │                           │  (Conditional Node) │
-└─────────────────────┘                           └─────────────────────┘
+┌─────────────────────────┐         ┌─────────────────────┐         ┌─────────────────────┐
+│  Requirements Analyzer  │────────▶│  Software Design    │────────▶│   C Code Analyzer   │
+│                         │         │      Agent          │         │                     │
+│ • Validate requirements │         │ • Generate design   │         │ • Analyze code      │
+│ • Check consistency     │         │ • Validate quality  │         │ • Generate tests    │
+│ • Generate UATs         │         │ • ISO 26262 align   │         │ • Check standards   │
+└─────────────────────────┘         └─────────────────────┘         └─────────────────────┘
 ```
+
+Each agent uses a **conditional sequential graph** pattern with 2 nodes:
 
 ### Requirements Analyzer
 ```
@@ -52,6 +72,22 @@ Both agents use a **conditional sequential graph** pattern with 2 nodes:
 │ Requirements Consistency│─────────────────────────▶│ User Acceptance Test        │
 │ Analyzer (Entry Point)  │                          │ Generator                   │
 └─────────────────────────┘                          └─────────────────────────────┘
+```
+
+### Software Design Agent
+```
+┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
+│ Design Generator    │────severity issues────────▶│  Design Validator   │
+│   (Entry Point)     │                            │  (Conditional Node) │
+└─────────────────────┘                            └─────────────────────┘
+```
+
+### C Code Analyzer
+```
+┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
+│ Automotive Analyzer │────severity violations───▶│  Unit Test Generator│
+│   (Entry Point)     │                           │  (Conditional Node) │
+└─────────────────────┘                           └─────────────────────┘
 ```
 
 **Technical Stack:**
@@ -66,42 +102,57 @@ Both agents use a **conditional sequential graph** pattern with 2 nodes:
 ```
 automotive-strands-agents-in-runtime/
 ├── backend/                                    # Backend Agent Services
-│   ├── c-code-analyzer-agent/                 # C Code Analysis Agent
-│   │   ├── sample_automotive_code/            # Sample C code for testing
-│   │   │   ├── tests/                         # Generated unit tests
-│   │   │   │   ├── test_sample_with_minor_violations.c
-│   │   │   │   ├── Makefile
-│   │   │   │   └── README.md
-│   │   │   ├── sample_with_severe_violations.c
-│   │   │   ├── sample_with_minor_violations.c
-│   │   │   ├── sample_automotive_compliant.c
-│   │   │   └── README.md
-│   │   ├── automotive_c_analyzer_notebook.ipynb
-│   │   ├── c_code_analyzer.py
+│   ├── requirements-agent/                    # Requirements Analysis Agent
+│   │   ├── automotive_requirements_agent_notebook.ipynb
+│   │   ├── requirements_analyzer.py
 │   │   ├── utils.py
 │   │   ├── requirements.txt
-│   │   └── Dockerfile
-│   └── requirements-agent/                    # Requirements Analysis Agent
-│       ├── automotive_requirements_agent_notebook.ipynb
-│       ├── requirements_analyzer.py
+│   │   ├── Dockerfile
+│   │   └── README.md
+│   ├── design-agent/                          # Software Design Agent
+│   │   ├── automotive_design_agent_notebook.ipynb
+│   │   ├── design_generator.py
+│   │   ├── utils.py
+│   │   ├── requirements.txt
+│   │   ├── Dockerfile
+│   │   └── README.md
+│   └── c-code-analyzer-agent/                 # C Code Analysis Agent
+│       ├── sample_automotive_code/            # Sample C code for testing
+│       │   ├── tests/                         # Generated unit tests
+│       │   │   ├── test_sample_with_minor_violations.c
+│       │   │   ├── Makefile
+│       │   │   └── README.md
+│       │   ├── sample_with_severe_violations.c
+│       │   ├── sample_with_minor_violations.c
+│       │   ├── sample_automotive_compliant.c
+│       │   └── README.md
+│       ├── automotive_c_analyzer_notebook.ipynb
+│       ├── c_code_analyzer.py
 │       ├── utils.py
 │       ├── requirements.txt
-│       ├── Dockerfile
-│       └── README.md
+│       └── Dockerfile
 ├── mcp-servers/                               # Model Context Protocol Servers
-│   ├── automotive-coding-mcp/                 # C Code Analysis MCP Server
-│   │   ├── coding-server.py
+│   ├── automotive-requirements-mcp/           # Requirements Analysis MCP Server
+│   │   ├── requirements-server.py
 │   │   ├── requirements.txt
-│   │   └── test_config.py
-│   └── automotive-requirements-mcp/           # Requirements Analysis MCP Server
-│       ├── requirements-server.py
+│   │   ├── test_config.py
+│   │   └── README.md
+│   ├── automotive-design-mcp/                 # Software Design MCP Server
+│   │   ├── design-server.py
+│   │   ├── requirements.txt
+│   │   ├── test_config.py
+│   │   └── README.md
+│   └── automotive-coding-mcp/                 # C Code Analysis MCP Server
+│       ├── coding-server.py
 │       ├── requirements.txt
-│       ├── test_config.py
-│       └── README.md
+│       └── test_config.py
 ├── ide-support/                               # IDE Integration Support
 │   ├── kiro/                                  # Kiro IDE Configuration
 │   │   ├── settings/mcp.json                  # MCP server configuration
 │   │   └── steering/                          # Agent steering rules
+│   │       ├── requirements-agent-mcp-tool-use.md
+│   │       ├── design-agent-mcp-tool-use.md
+│   │       └── analyze-c-code-mcp-tool-use.md
 │   ├── cline/                                 # Cline IDE Configuration
 │   │   └── cline_mcp_settings.json
 │   └── .amazonq/                              # Amazon Q Configuration
@@ -162,6 +213,19 @@ jupyter notebook automotive_requirements_agent_notebook.ipynb
 
 For detailed setup instructions, path configuration, and troubleshooting, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
 
+### Software Design Agent
+
+The Software Design Agent transforms validated requirements into comprehensive technical design documents with conditional quality validation.
+
+**Quick Start:**
+```bash
+cd backend/design-agent
+pip install -r requirements.txt
+jupyter notebook automotive_design_agent_notebook.ipynb
+```
+
+For detailed setup instructions, design completeness analysis, and validation workflows, see the [Software Design Agent README](backend/design-agent/README.md).
+
 ### MCP Server Integration for IDEs
 
 #### Kiro IDE Setup
@@ -180,16 +244,20 @@ For detailed setup instructions, path configuration, and troubleshooting, see th
 2. Update paths and credentials as needed
 
 #### Available MCP Tools
-- `mcp_automotive_coding_analyze_c_code` - Analyze C code for automotive standards
 - `mcp_automotive_requirements_automotive_requirements_analyzer` - Analyze requirements documents
+- `mcp_automotive_design_automotive_design_generator` - Generate technical design from requirements
+- `mcp_automotive_coding_analyze_c_code` - Analyze C code for automotive standards
 
 ## Sample Test Cases
 
-### C Code Analysis
-The C Code Analyzer includes sample automotive C code with varying levels of compliance violations. For detailed information about test cases, generated unit tests, and automotive coding standards, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
-
 ### Requirements Analysis  
 The Requirements Analyzer works with sample business and technical requirements documents located in `weather-app/`. For detailed information about requirements analysis workflows and test case generation, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
+
+### Software Design Generation
+The Software Design Agent uses validated requirements from the Requirements Analyzer to generate comprehensive technical design documents. For detailed information about design completeness analysis, validation workflows, and ISO 26262 alignment, see the [Software Design Agent README](backend/design-agent/README.md).
+
+### C Code Analysis
+The C Code Analyzer includes sample automotive C code with varying levels of compliance violations. For detailed information about test cases, generated unit tests, and automotive coding standards, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
 
 ## Security & Deployment
 
@@ -211,16 +279,22 @@ This system is specifically designed for automotive software development with:
 ### Model Context Protocol (MCP) Servers
 The project includes MCP servers for seamless IDE integration:
 
-#### Automotive Coding MCP Server
-- **Location**: `mcp-servers/automotive-coding-mcp/`
-- **Function**: `mcp_automotive_coding_analyze_c_code`
-- **Purpose**: Analyze C code for automotive standards compliance and generate unit tests
-- **Usage**: Integrated into IDEs via MCP protocol
-
 #### Automotive Requirements MCP Server  
 - **Location**: `mcp-servers/automotive-requirements-mcp/`
 - **Function**: `mcp_automotive_requirements_automotive_requirements_analyzer`
 - **Purpose**: Analyze requirements documents and generate user acceptance tests
+- **Usage**: Integrated into IDEs via MCP protocol
+
+#### Automotive Design MCP Server
+- **Location**: `mcp-servers/automotive-design-mcp/`
+- **Function**: `mcp_automotive_design_automotive_design_generator`
+- **Purpose**: Generate technical design documents from validated requirements with conditional quality validation
+- **Usage**: Integrated into IDEs via MCP protocol
+
+#### Automotive Coding MCP Server
+- **Location**: `mcp-servers/automotive-coding-mcp/`
+- **Function**: `mcp_automotive_coding_analyze_c_code`
+- **Purpose**: Analyze C code for automotive standards compliance and generate unit tests
 - **Usage**: Integrated into IDEs via MCP protocol
 
 ### IDE Support
@@ -237,21 +311,29 @@ The project includes MCP servers for seamless IDE integration:
 ## Development Workflow
 
 ### Using MCP Tools in IDEs
-1. **Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` in your IDE to analyze C code
-2. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` for requirements documents
+The three-agent workflow follows a sequential process from requirements to code:
+
+1. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` to validate business and technical requirements
+2. **Design Generation**: Use `#mcp_automotive_design_automotive_design_generator` to generate technical design documents from validated requirements
+3. **Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` to analyze C code implementation against design specifications
 
 ### Testing Your Setup
 ```bash
-# Test C Code Analysis MCP Server
-cd mcp-servers/automotive-coding-mcp
-python test_config.py
-
 # Test Requirements Analysis MCP Server  
 cd mcp-servers/automotive-requirements-mcp
+python test_config.py
+
+# Test Software Design MCP Server
+cd mcp-servers/automotive-design-mcp
+python test_config.py
+
+# Test C Code Analysis MCP Server
+cd mcp-servers/automotive-coding-mcp
 python test_config.py
 ```
 
 ## Next Steps
 
-- **Technical Design Coverage**: Generate/validate technical designs based on requirements
-- **Anroid Code Generation Coverage**: Generate code/unit tests for Android. Validate via simulator
+- **Android Code Generation Coverage**: Generate code/unit tests for Android. Validate via simulator
+- **Enhanced Design Validation**: Add visual design tools and interactive architecture diagrams
+- **Code Generation Integration**: Generate code scaffolding directly from design documents

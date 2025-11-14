@@ -17,6 +17,24 @@
         "automotive_requirements_analyzer"
       ],
       "disabledTools": []
+    },
+    "automotive-design": {
+      "command": "./.venv/bin/python", //path to your local python environment
+      "args": [
+        "automotive-strands-agents-in-runtime/mcp-servers/automotive-design-mcp/design-server.py"
+      ],
+      "env": {
+        "AWS_REGION": "us-west-2",
+        "FASTMCP_LOG_LEVEL": "INFO",
+        "COGNITO_CLIENT_ID": "6kou4hilv45c3e2lyyyy2zzzz4", // put your own cognito client id from the notebooks here.
+        "COGNITO_USERNAME": "testuser",
+        "COGNITO_PASSWORD": "MyPassword123!"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "automotive_design_generator"
+      ],
+      "disabledTools": []
     }
   }
 }
