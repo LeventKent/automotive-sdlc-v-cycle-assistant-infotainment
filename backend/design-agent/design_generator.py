@@ -24,7 +24,9 @@ design_agent = Agent(
     model=bedrock_model,
     system_prompt="""You are an automotive software architect specializing in vehicle infotainment and safety systems. 
 
-Generate comprehensive technical design documents from validated requirements that include:
+Generate comprehensive technical design documents from validated business requirements document (BRD), software requirements document (SRD) and other supplementary documents if they exist.
+
+In your technical design document ALWAYS include:
 
 - **Architecture Overview**: High-level system architecture with component diagram
 - **Component Specifications**: Detailed specifications for each component
@@ -46,7 +48,7 @@ def automotive_design_generator(payload):
     Automotive design generator - creates technical design documents from requirements.
     
     Args:
-        payload: Dictionary containing requirements_docs
+        payload: Dictionary containing srd_documents, brd_documents, and optional other_documents
         
     Returns:
         Dictionary with design generation results
@@ -57,26 +59,50 @@ def automotive_design_generator(payload):
     start_time = time.time()
     
     try:
-        # Extract requirements_docs from payload
-        requirements_docs = payload.get("requirements_docs")
+        # Extract documents from payload
+        srd_documents = payload.get("srd_documents")
+        brd_documents = payload.get("brd_documents")
+        other_documents = payload.get("other_documents", "")
         
-        # Validate input
-        if not requirements_docs:
+        # Validate mandatory inputs
+        if not srd_documents:
             error_response = {
-                "error": "No requirements documents provided",
-                "message": "The 'requirements_docs' field is required in the payload"
+                "error": "No SRD documents provided",
+                "message": "The 'srd_documents' field is required in the payload"
+            }
+            print(f"[ERROR] {error_response['error']}")
+            return error_response
+            
+        if not brd_documents:
+            error_response = {
+                "error": "No BRD documents provided",
+                "message": "The 'brd_documents' field is required in the payload"
             }
             print(f"[ERROR] {error_response['error']}")
             return error_response
         
-        print(f"[INFO] Requirements docs length: {len(requirements_docs)} characters")
+        print(f"[INFO] SRD docs length: {len(srd_documents)} characters")
+        print(f"[INFO] BRD docs length: {len(brd_documents)} characters")
+        print(f"[INFO] Other docs length: {len(other_documents)} characters")
         
-        # Create prompt
+        # Create comprehensive prompt with structured requirements
         prompt = f"""Generate a comprehensive technical design document from the following validated requirements:
 
-{requirements_docs}
+## Software Requirements Document (SRD):
+{srd_documents}
 
-Ensure the design covers all required sections and aligns with automotive safety standards."""
+## Business Requirements Document (BRD):
+{brd_documents}"""
+
+        if other_documents.strip():
+            prompt += f"""
+
+## Additional Supporting Documents:
+{other_documents}"""
+
+        prompt += """
+
+Ensure the design covers all required sections and aligns with automotive safety standards. Consider both business and software requirements when creating the technical architecture."""
         
         print("[INFO] Executing design agent...")
         

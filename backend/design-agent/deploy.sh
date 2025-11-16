@@ -98,10 +98,10 @@ check_prerequisites() {
     fi
     
     # Check Docker
-    if ! docker info &> /dev/null; then
-        log_error "Docker is not running. Please start Docker."
-        exit 1
-    fi
+    #if ! docker info &> /dev/null; then
+    #    log_error "Docker is not running. Please start Docker."
+    #    exit 1
+    #fi
     
     # Check Python
     if ! command -v python3 &> /dev/null; then
