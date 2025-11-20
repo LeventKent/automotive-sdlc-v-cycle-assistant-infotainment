@@ -186,7 +186,7 @@ class AutomotiveDesignAgent:
             logger.error(f"Failed to obtain bearer token: {str(e)}")
             raise Exception(f"Authentication failed: {str(e)}")
     
-    def invoke_agent(self, srd_documents: str, brd_documents: str, other_documents: str = "", bearer_token: Optional[str] = None) -> dict:
+    def invoke_agent(self, srs_documents: str, brd_documents: str, other_documents: str = "", bearer_token: Optional[str] = None) -> dict:
         """Invoke the AgentCore runtime agent with structured requirements documents for design generation
         uses low level http requests as AgentCoreRuntime API does not support bearer tokens as of now.
         See: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-oauth.html"""
@@ -221,7 +221,7 @@ class AutomotiveDesignAgent:
             
             # Prepare the payload with structured documents
             payload = {
-                "srd_documents": srd_documents,
+                "srs_documents": srs_documents,
                 "brd_documents": brd_documents,
                 "other_documents": other_documents
             }
@@ -261,7 +261,7 @@ agent = AutomotiveDesignAgent()
 
 @mcp.tool()
 def automotive_design_generator(
-    srd_documents: str,
+    srs_documents: str,
     brd_documents: str,
     other_documents: str = ""
 ) -> str:
@@ -275,7 +275,7 @@ def automotive_design_generator(
     Authentication is handled automatically using Cognito credentials from environment variables.
     
     Args:
-        srd_documents: The Software Requirements Document (SRD) - mandatory
+        srs_documents: The Software Requirements Document (SRS) - mandatory
         brd_documents: The Business Requirements Document (BRD) - mandatory
         other_documents: Additional supporting documents - optional
     
@@ -285,11 +285,11 @@ def automotive_design_generator(
         - Design generation results with completeness analysis
         - Design validation results (if design is complete enough)
     """
-    if not srd_documents.strip():
+    if not srs_documents.strip():
         return json.dumps({
-            "error": "No SRD documents provided for design generation",
+            "error": "No SRS documents provided for design generation",
             "step1_design_generation": {"design": None, "completeness_analysis": None},
-            "step2_design_validation": {"validated": False, "reason": "No SRD documents provided"}
+            "step2_design_validation": {"validated": False, "reason": "No SRS documents provided"}
         })
     
     if not brd_documents.strip():
@@ -301,7 +301,7 @@ def automotive_design_generator(
     
     try:
         # Invoke the multi-agent automotive design generator (authentication handled automatically)
-        result = agent.invoke_agent(srd_documents, brd_documents, other_documents)
+        result = agent.invoke_agent(srs_documents, brd_documents, other_documents)
         
         # Return the structured result as JSON string
         return json.dumps(result, indent=2)

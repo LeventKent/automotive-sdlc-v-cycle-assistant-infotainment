@@ -145,28 +145,34 @@ Resources:
           import boto3
           import os
           from botocore.exceptions import ClientError
-          
+
           s3_client = boto3.client('s3')
-          
+
           def lambda_handler(event, context):
               """
               Lambda function to retrieve design guidelines from S3
               """
+              print(f"Context: , {context.client_context}")
+              print(f"Event: , {event}")
+
               try:
-                  # Extract parameters from the event
-                  function_name = event.get('function_name')
+                  # Extract parameters context and retrieve documents
+                  toolName = context.client_context.custom['bedrockAgentCoreToolName']
+                  delimiter = "___"
+                  if delimiter in toolName:
+                      toolName = toolName[toolName.index(delimiter) + len(delimiter):]
                   bucket_name = os.environ['BUCKET_NAME']
                   
-                  if function_name == 'get_technical_guidelines':
+                  if toolName == 'get_technical_guidelines':
                       return get_technical_guidelines(bucket_name, event.get('guideline_type', 'general'))
-                  elif function_name == 'list_available_guidelines':
+                  elif toolName == 'list_available_guidelines':
                       return list_available_guidelines(bucket_name)
-                  elif function_name == 'get_guideline_by_category':
+                  elif toolName == 'get_guideline_by_category':
                       return get_guideline_by_category(bucket_name, event.get('category', 'architecture'))
                   else:
                       return {
                           'statusCode': 400,
-                          'body': json.dumps({'error': 'Unknown function name'})
+                          'body': json.dumps({'error': 'Unknown tool name'})
                       }
               
               except Exception as e:
@@ -174,7 +180,7 @@ Resources:
                       'statusCode': 500,
                       'body': json.dumps({'error': str(e)})
                   }
-          
+
           def get_technical_guidelines(bucket_name, guideline_type):
               """Get technical design guidelines from S3"""
               try:
@@ -208,7 +214,7 @@ Resources:
                       }
                   else:
                       raise e
-          
+
           def list_available_guidelines(bucket_name):
               """List all available guideline files in S3"""
               try:
@@ -239,7 +245,7 @@ Resources:
                       'statusCode': 500,
                       'body': json.dumps({'error': str(e)})
                   }
-          
+
           def get_guideline_by_category(bucket_name, category):
               """Get guidelines filtered by category"""
               try:
@@ -274,6 +280,7 @@ Resources:
                       }
                   else:
                       raise e
+
 
   # IAM Role for Lambda function
   DesignGuidelinesLambdaRole:

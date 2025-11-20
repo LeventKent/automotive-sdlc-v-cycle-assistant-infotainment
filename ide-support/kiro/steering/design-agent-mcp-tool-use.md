@@ -24,10 +24,17 @@ When a JSON output has been detected from the `mcp_automotive_design_automotive_
 ## Example Usage Pattern
 
 ```
-User: "Generate technical design for weather app"
+User: "Generate technical design for weather app using weather_app_brd.md and weather_app_srs.md"
+→ Kiro calls MCP tool supplying documents 
+   if files matching both BRD (pattern *brd.md) and SRS(pattern: *srs.md) are to be sent as parameters
+      Kiro DIRECTLY calls the MCP endpoint with a payload such as
+         {
+            "brd_documents": $(cat weather_app_brd.md),
+            "srs_documents": $(cat weather_app_srs.md)
+         }
 → MCP tool generates design
-→ Kiro detects JSON output with design content
-→ Kiro saves to: weather-app/technical-design/weather_app_technical_design.md
+→ Kiro detects JSON output with technical design content
+→ Kiro saves technical design to: weather-app/technical-design/weather_app_technical_design.md
 → Kiro confirms: "Technical design saved to weather-app/technical-design/weather_app_technical_design.md"
 ```
 
