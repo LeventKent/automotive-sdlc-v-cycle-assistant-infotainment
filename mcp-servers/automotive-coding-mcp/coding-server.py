@@ -249,27 +249,39 @@ class AutomotiveCodingAgent:
 # Initialize the agent
 agent = AutomotiveCodingAgent()
 
-@mcp.tool()
+@mcp.tool(
+    description="Analyze C code for custom automotive coding standards compliance and generates unit tests if there are no severe violations. This tool implements a multi-step automotive C code analyzer using agent graph with: 1) Custom automotive coding standards compliance check (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001), 2) Conditional unit test generation (only if no severe violations found). Authentication is handled automatically using Cognito credentials from environment variables."
+)
 def analyze_c_code(
     c_code: str
 ) -> str:
     """
     Analyze C code for custom automotive coding standards compliance and generates unit tests if there are no severe violations.
     
-    This tool implements a multi-step automotive C code analyzer using agent graph with:
-    1. Custom automotive coding standards compliance check (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
-    2. Conditional unit test generation (only if no severe violations found)
+    Parameters
+    ----------
+    c_code : str
+        The C code to analyze for automotive coding standards compliance and unit test generation. Should be complete, compilable C code following standard C syntax.
     
-    Authentication is handled automatically using Cognito credentials from environment variables.
-    
-    Args:
-        c_code: The C code to analyze for automotive coding standards compliance and unit test generation
-    
-    Returns:
+    Returns
+    -------
+    str
         JSON string containing:
-        - Graph execution metrics
-        - Automotive coding standards compliance analysis results
-        - Unit test generation results (if applicable)
+        - Graph execution metrics (timing, steps executed)
+        - Automotive coding standards compliance analysis results (violations categorized by severity)
+        - Unit test generation results (if applicable, only generated when no severe violations found)
+        
+    Examples
+    --------
+    >>> result = analyze_c_code(
+    ...     c_code=\"\"\"
+    ...     #include <stdio.h>
+    ...     int calculate_speed(int distance, int time) {
+    ...         if (time == 0) return -1;
+    ...         return distance / time;
+    ...     }
+    ...     \"\"\"
+    ... )
     """
     if not c_code.strip():
         return json.dumps({

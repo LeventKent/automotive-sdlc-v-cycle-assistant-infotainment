@@ -8,7 +8,7 @@ import logging
 import os
 import time
 import urllib.parse
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Annotated
 
 import boto3
 import requests
@@ -259,31 +259,41 @@ class AutomotiveDesignAgent:
 # Initialize the agent
 agent = AutomotiveDesignAgent()
 
-@mcp.tool()
+@mcp.tool(
+    description="Generate technical design documents from validated requirements. Supply at least one SRS (software requirements specification) and one BRD (business requirements specification) document to create technical designs."
+)
 def automotive_design_generator(
-    srs_documents: str,
-    brd_documents: str,
+    srs_documents: Annotated[str, "The Software Requirements Document (SRS) content - mandatory. Contains all functional and non-functional software requirements." ],
+    brd_documents: Annotated[str, "The Business Requirements Document (BRD) content - mandatory. Contains business objectives, stakeholder needs, and high-level requirements." ],
     other_documents: str = ""
 ) -> str:
     """
     Generate technical design documents from validated requirements.
     
-    This tool implements a multi-step automotive design generator using agent graph with:
-    1. Design Generation (creates comprehensive technical design with completeness analysis)
-    2. Design Validation (conditionally validates design quality and architectural soundness)
+    Parameters
+    ----------
+    srs_documents : str
+        The Software Requirements Document (SRS) content - mandatory. Contains all functional and non-functional software requirements.
+    brd_documents : str
+        The Business Requirements Document (BRD) content - mandatory. Contains business objectives, stakeholder needs, and high-level requirements.
+    other_documents : str, optional
+        Additional supporting documents - optional. Can include architecture diagrams, constraints, or reference materials.
     
-    Authentication is handled automatically using Cognito credentials from environment variables.
-    
-    Args:
-        srs_documents: The Software Requirements Document (SRS) - mandatory
-        brd_documents: The Business Requirements Document (BRD) - mandatory
-        other_documents: Additional supporting documents - optional
-    
-    Returns:
+    Returns
+    -------
+    str
         JSON string containing:
-        - Graph execution metrics
+        - Graph execution metrics (timing, steps executed)
         - Design generation results with completeness analysis
         - Design validation results (if design is complete enough)
+        
+    Examples
+    --------
+    >>> result = automotive_design_generator(
+    ...     srs_documents="<SRS content here>",
+    ...     brd_documents="<BRD content here>",
+    ...     other_documents="<optional additional docs>"
+    ... )
     """
     if not srs_documents.strip():
         return json.dumps({
