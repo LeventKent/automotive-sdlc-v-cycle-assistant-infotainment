@@ -1,37 +1,39 @@
 # Design Agent MCP Tool Usage Guidelines
 
+User: "Generate technical design for weather app using weather_app_brd.md and weather_app_srs.md"
+
 When a JSON output has been detected from the `mcp_automotive_design_automotive_design_generator` or `automotive_design_generator` MCP tool, examine the content and automatically save the generated technical design document.
+
+When a user asks for the generation of technical designs using an SRS and a BRD document (such as User: "Generate technical design for weather app using weather_app_brd.md and weather_app_srs.md"), execute the following steps
 
 ## Processing Steps
 
-1. **Detect Design Generation Output**: Look for JSON responses from the automotive design generator tool that contain a `step1_design_generation.design` field.
+1. Construct the payload using the absolute file paths
 
-2. **Extract Design Content**: Extract the complete technical design document from the `design` field in the JSON response.
+2. Call the automotive design generator tool
 
-3. **Determine Save Location**: Save the technical design document using this priority order:
+3. **Detect Design Generation Output**: Look for JSON responses from the automotive design generator tool that contain a `step1_design_generation.design` field.
+
+4. **Extract Design Content**: Extract the complete technical design document from the `design` field in the JSON response.
+
+5. **Determine Save Location**: Save the technical design document using this priority order:
    - If a project-specific technical design directory exists (e.g., `*/technical-design/`), save there
    - If a project root directory is identifiable, create a `technical-design/` subdirectory
    - Otherwise, save in the current working directory under `technical-design/`
 
-4. **Generate Filename**: Create an appropriate filename based on:
+6. **Generate Filename**: Create an appropriate filename based on:
    - Project name if identifiable from the requirements documents
    - Use format: `{project_name}_technical_design.md`
 
-5. **Save Document**: Write the complete technical design document to the determined location with the generated filename.
+7. **Save Document**: Write the complete technical design document to the determined location with the generated filename.
 
-6. **Provide Confirmation**: Inform the user of the save location and filename.
+8. **Provide Confirmation**: Inform the user of the save location and filename.
 
 ## Example Usage Pattern
 
 ```
 User: "Generate technical design for weather app using weather_app_brd.md and weather_app_srs.md"
-→ Kiro calls MCP tool supplying documents 
-   if files matching both BRD (pattern *brd.md) and SRS(pattern: *srs.md) are to be sent as parameters
-      Kiro DIRECTLY calls the MCP endpoint with a payload such as
-         {
-            "brd_documents": $(cat weather_app_brd.md),
-            "srs_documents": $(cat weather_app_srs.md)
-         }
+→ Kiro calls MCP tool supplying documents absolute file paths
 → MCP tool generates design
 → Kiro detects JSON output with technical design content
 → Kiro saves technical design to: weather-app/technical-design/weather_app_technical_design.md
