@@ -260,11 +260,11 @@ class AutomotiveDesignAgent:
 agent = AutomotiveDesignAgent()
 
 @mcp.tool(
-    description="Generate technical design documents from validated requirements. Supply at least one SRS (software requirements specification) and one BRD (business requirements specification) document to create technical designs."
+    description="Generate technical design documents from validated requirements. Supply absolute file paths of documents to create technical designs."
 )
 def automotive_design_generator(
-    srs_documents: Annotated[str, "The Software Requirements Document (SRS) content - mandatory. Contains all functional and non-functional software requirements." ],
-    brd_documents: Annotated[str, "The Business Requirements Document (BRD) content - mandatory. Contains business objectives, stakeholder needs, and high-level requirements." ],
+    srs_documents: Annotated[str, "Absolute file path to the Software Requirements Document (SRS) - mandatory. Contains all functional and non-functional software requirements." ],
+    brd_documents: Annotated[str, "Absolute file path to the Business Requirements Document (BRD) - mandatory. Contains business objectives, stakeholder needs, and high-level requirements." ],
     other_documents: str = ""
 ) -> str:
     """
@@ -273,11 +273,11 @@ def automotive_design_generator(
     Parameters
     ----------
     srs_documents : str
-        The Software Requirements Document (SRS) content - mandatory. Contains all functional and non-functional software requirements.
+        Absolute file path to the Software Requirements Document (SRS) - mandatory.
     brd_documents : str
-        The Business Requirements Document (BRD) content - mandatory. Contains business objectives, stakeholder needs, and high-level requirements.
+        Absolute file path to the Business Requirements Document (BRD) - mandatory.
     other_documents : str, optional
-        Additional supporting documents - optional. Can include architecture diagrams, constraints, or reference materials.
+        Absolute file path to additional supporting documents - optional.
     
     Returns
     -------
@@ -290,28 +290,76 @@ def automotive_design_generator(
     Examples
     --------
     >>> result = automotive_design_generator(
-    ...     srs_documents="<SRS content here>",
-    ...     brd_documents="<BRD content here>",
-    ...     other_documents="<optional additional docs>"
+    ...     srs_documents="/path/to/srs.md",
+    ...     brd_documents="/path/to/brd.md",
+    ...     other_documents="/path/to/additional.md"
     ... )
     """
     if not srs_documents.strip():
         return json.dumps({
-            "error": "No SRS documents provided for design generation",
+            "error": "No SRS document path provided for design generation",
             "step1_design_generation": {"design": None, "completeness_analysis": None},
-            "step2_design_validation": {"validated": False, "reason": "No SRS documents provided"}
+            "step2_design_validation": {"validated": False, "reason": "No SRS document path provided"}
         })
     
     if not brd_documents.strip():
         return json.dumps({
-            "error": "No BRD documents provided for design generation",
+            "error": "No BRD document path provided for design generation",
             "step1_design_generation": {"design": None, "completeness_analysis": None},
-            "step2_design_validation": {"validated": False, "reason": "No BRD documents provided"}
+            "step2_design_validation": {"validated": False, "reason": "No BRD document path provided"}
         })
     
     try:
-        # Invoke the multi-agent automotive design generator (authentication handled automatically)
-        result = agent.invoke_agent(srs_documents, brd_documents, other_documents)
+        # Read the SRS document from file
+        try:
+            with open(srs_documents, 'r', encoding='utf-8') as f:
+                srs_content = f.read()
+            logger.info(f"Successfully read SRS document from: {srs_documents}")
+        except FileNotFoundError:
+            return json.dumps({
+                "error": f"SRS document not found at path: {srs_documents}",
+                "step1_design_generation": {"design": None, "completeness_analysis": None},
+                "step2_design_validation": {"validated": False, "reason": "SRS file not found"}
+            })
+        except Exception as e:
+            return json.dumps({
+                "error": f"Failed to read SRS document: {str(e)}",
+                "step1_design_generation": {"design": None, "completeness_analysis": None},
+                "step2_design_validation": {"validated": False, "reason": f"SRS read error: {str(e)}"}
+            })
+        
+        # Read the BRD document from file
+        try:
+            with open(brd_documents, 'r', encoding='utf-8') as f:
+                brd_content = f.read()
+            logger.info(f"Successfully read BRD document from: {brd_documents}")
+        except FileNotFoundError:
+            return json.dumps({
+                "error": f"BRD document not found at path: {brd_documents}",
+                "step1_design_generation": {"design": None, "completeness_analysis": None},
+                "step2_design_validation": {"validated": False, "reason": "BRD file not found"}
+            })
+        except Exception as e:
+            return json.dumps({
+                "error": f"Failed to read BRD document: {str(e)}",
+                "step1_design_generation": {"design": None, "completeness_analysis": None},
+                "step2_design_validation": {"validated": False, "reason": f"BRD read error: {str(e)}"}
+            })
+        
+        # Read optional other documents from file if provided
+        other_content = ""
+        if other_documents.strip():
+            try:
+                with open(other_documents, 'r', encoding='utf-8') as f:
+                    other_content = f.read()
+                logger.info(f"Successfully read additional document from: {other_documents}")
+            except FileNotFoundError:
+                logger.warning(f"Additional document not found at path: {other_documents}, continuing without it")
+            except Exception as e:
+                logger.warning(f"Failed to read additional document: {str(e)}, continuing without it")
+        
+        # Invoke the multi-agent automotive design generator with the extracted content
+        result = agent.invoke_agent(srs_content, brd_content, other_content)
         
         # Return the structured result as JSON string
         return json.dumps(result, indent=2)
