@@ -33,13 +33,10 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         # Search for .bedrock_agentcore.yaml in common locations
         search_paths = [
             ".bedrock_agentcore.yaml",
-            "../.bedrock_agentcore.yaml",
-            "../../.bedrock_agentcore.yaml",
-            "../../backend/design-agent/.bedrock_agentcore.yaml",
+            "./automotive-strands-agents-in-runtime/mcp-servers/automotive-design-mcp/.bedrock_agentcore.yaml",
+            "./mcp-servers/automotive-design-mcp/.bedrock_agentcore.yaml",
             "./automotive-strands-agents-in-runtime/backend/design-agent/.bedrock_agentcore.yaml",
-            "../automotive-strands-agents-in-runtime/backend/design-agent/.bedrock_agentcore.yaml",
-            "~/dev/git/automotive-agents-in-runtime/automotive-strands-agents-in-runtime/backend/design-agent/.bedrock_agentcore.yaml",
-            "/Users/dschlei/development/automotive-strands-agents-in-runtime/backend/design-agent/.bedrock_agentcore.yaml"
+            "./backend/design-agent/.bedrock_agentcore.yaml"
         ]
 
         # Log current working directory for debugging
