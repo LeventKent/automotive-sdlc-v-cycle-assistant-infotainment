@@ -9,7 +9,7 @@ import os
 import time
 import urllib.parse
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Annotated
 
 import boto3
 import requests
@@ -221,7 +221,7 @@ class AutomotiveRequirementsAgent:
                 url,
                 headers=headers,
                 data=json.dumps(payload),
-                timeout=600
+                timeout=900
             )
             
             logger.info(f"AgentCore API response status: {response.status_code}")
@@ -249,9 +249,11 @@ class AutomotiveRequirementsAgent:
 # Initialize the agent
 agent = AutomotiveRequirementsAgent()
 
-@mcp.tool()
+@mcp.tool(
+    description="Analyze automotive requirements documents for consistency and generate user acceptance tests. Supply absolute file paths of documents to analyze."
+)
 def automotive_requirements_analyzer(
-    requirements_docs: str
+    requirements_docs: Annotated[str, "Absolute file path to the requirements documents (BRD, PRD, etc.) to analyze for consistency and UAT generation"]
 ) -> str:
     """
     Analyze automotive requirements documents for consistency and generate user acceptance tests.
@@ -262,25 +264,53 @@ def automotive_requirements_analyzer(
     
     Authentication is handled automatically using Cognito credentials from environment variables.
     
-    Args:
-        requirements_docs: The requirements documents (BRD, PRD, etc.) to analyze for consistency and UAT generation
+    Parameters
+    ----------
+    requirements_docs : str
+        Absolute file path to the requirements documents (BRD, PRD, etc.) to analyze for consistency and UAT generation
     
-    Returns:
+    Returns
+    -------
+    str
         JSON string containing:
         - Graph execution metrics
         - Requirements consistency analysis results
         - User acceptance test generation results
+        
+    Examples
+    --------
+    >>> result = automotive_requirements_analyzer(
+    ...     requirements_docs="/path/to/requirements.md"
+    ... )
     """
     if not requirements_docs.strip():
         return json.dumps({
-            "error": "No requirements documents provided for analysis",
+            "error": "No requirements document path provided for analysis",
             "step1_requirements_analysis": {"analysis": "No requirements provided", "issues": []},
             "step2_user_acceptance_tests": {"generated": False, "reason": "No requirements provided"}
         })
     
     try:
-        # Invoke the multi-agent automotive requirements analyzer (authentication handled automatically)
-        result = agent.invoke_agent(requirements_docs)
+        # Read the requirements document from file
+        try:
+            with open(requirements_docs, 'r', encoding='utf-8') as f:
+                requirements_content = f.read()
+            logger.info(f"Successfully read requirements document from: {requirements_docs}")
+        except FileNotFoundError:
+            return json.dumps({
+                "error": f"Requirements document not found at path: {requirements_docs}",
+                "step1_requirements_analysis": {"analysis": "File not found", "issues": []},
+                "step2_user_acceptance_tests": {"generated": False, "reason": "Requirements file not found"}
+            })
+        except Exception as e:
+            return json.dumps({
+                "error": f"Failed to read requirements document: {str(e)}",
+                "step1_requirements_analysis": {"analysis": "File read error", "issues": []},
+                "step2_user_acceptance_tests": {"generated": False, "reason": f"Requirements read error: {str(e)}"}
+            })
+        
+        # Invoke the multi-agent automotive requirements analyzer with the extracted content
+        result = agent.invoke_agent(requirements_content)
         
         # Return the structured result as JSON string
         return json.dumps(result, indent=2)

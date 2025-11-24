@@ -1,6 +1,5 @@
 # Design Agent MCP Tool Usage Guidelines
 
-User: "Generate technical design for weather app using weather_app_brd.md and weather_app_srs.md"
 
 When a JSON output has been detected from the `mcp_automotive_design_automotive_design_generator` or `automotive_design_generator` MCP tool, examine the content and automatically save the generated technical design document.
 
