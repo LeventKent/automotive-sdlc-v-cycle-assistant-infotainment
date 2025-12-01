@@ -1,24 +1,23 @@
 # Automotive Technical Design Generator
 
-This directory contains a comprehensive automotive technical design generator implemented using Strands Agents framework and deployed on Amazon Bedrock AgentCore Runtime. The agent generates technical design documents from business requirements (BRD), software requirements specification(SRS), and other supporting documents.
-
-## Overview
-
 The Technical Design Generator transforms validated requirements documents into comprehensive technical design documents for automotive software development. 
+
+The automotive technical design generator is implemented using Strands Agents framework and deployed on Amazon Bedrock AgentCore Runtime. The agent takes business requirements docuemtns (BRD), software requirements specification (SRS), and other supporting documents as input. During generation it follows the guidelines exposed as MCP endpoints via AgenCore Gateway.
+
 
 ## Architecture
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   MCP Client    │───▶│  AgentCore       │───▶│  Design Agent   │
-│ (design-server) │    │  Runtime         │    │  (Strands)      │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │                        │
-                                ▼                        ▼
-                       ┌──────────────────┐    ┌─────────────────┐
-                       │  AgentCore       │    │  S3 Guidelines  │
-                       │  Gateway         │    │  (via Lambda)   │
-                       └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌──────────────────────────┐             ┌─────────────────┐
+│   MCP Client    │───▶│  AgentCore Runtime       │──generates─▶│  Technical      │
+│ (design-server) │    │  Design Agent (Strands)  │             │  Design         │
+└─────────────────┘    └──────────────────────────┘             └─────────────────┘
+                                │
+                                ▼
+                       ┌──────────────────┐    ┌────────────────────────┐
+                       │  AgentCore       │───▶│  Technical Guidelines  │
+                       │  Gateway         │    │  (via Lambda)          │
+                       └──────────────────┘    └────────────────────────┘
 ```
 
 - **Agent**: Design generation
@@ -32,7 +31,7 @@ The Technical Design Generator transforms validated requirements documents into 
 
 ### 1. Design Generator Agent (`design_generator.py`)
 - **Primary Agent**: Generates comprehensive technical design documents
-- **Model**: Claude 3.5 Sonnet for high-quality design generation
+- **Model**: Claude 4.5 Haiku for high-quality design generation
 - **Tools**: AgentCore Gateway tools for accessing design guidelines
 - **Output**: Complete technical design with architecture, safety, and implementation sections
 
@@ -57,4 +56,26 @@ The Technical Design Generator transforms validated requirements documents into 
 - AgentCore Runtime permissions
 
 ### 1. Deploy Infrastructure
-Run notebook.
+Run notebook cells. This will deploy the agent to the agentcore runtime and an MCP server retrieving guidelines to AgentCore Gateway.
+
+### 2. Adjust the Settings/Steering Files for Local IDE
+- For Kiro, copy the configuration files from `.ide-support/kiro`. 
+- For Cline, use `./ide-support/cline`.
+- Adjust the Cognito Client-Id from your deployment from step 1.
+- Adjust your local Python path to the `design-server.py` if necessary.
+- Adjust your local Python if necessary.
+
+### Troubleshooting
+
+If you encounter deployment issues:
+
+1. Ensure all dependencies are installed
+2. Check AWS credentials are configured
+3. Review the notebook output for specific error messages
+
+For 424 "Failed Dependency" errors, the issue is typically related to:
+- Missing dependencies in requirements.txt
+- Docker container build failures
+- Import errors in the Python code
+
+

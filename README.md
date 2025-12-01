@@ -44,140 +44,10 @@ Multi-agent system for automotive C code analysis with custom automotive coding 
 **MCP Server:** `mcp-servers/automotive-coding-mcp/`  
 **Documentation:** See [C Code Analyzer README](backend/c-code-analyzer-agent/README.md) for detailed setup and usage instructions.
 
-### 4. IDE Integration Support
+## IDE Integration Support
 MCP servers and configuration files for seamless IDE integration with Kiro, Cline, and Amazon Q.
 - **Location**: `ide-support/`
-
-## Architecture
-
-### Three-Agent Workflow
-
-The system implements a complete requirements-to-code workflow with three specialized agents:
-
-```
-┌─────────────────────────┐         ┌─────────────────────┐         ┌─────────────────────┐
-│  Requirements Analyzer  │────────▶│  Software Design    │────────▶│   C Code Analyzer   │
-│                         │         │      Agent          │         │                     │
-│ • Validate requirements │         │ • Generate design   │         │ • Analyze code      │
-│ • Check consistency     │         │ • Validate quality  │         │ • Generate tests    │
-│ • Generate UATs         │         │ • ISO 26262 align   │         │ • Check standards   │
-└─────────────────────────┘         └─────────────────────┘         └─────────────────────┘
-```
-
-Each agent uses a **conditional sequential graph** pattern with 2 nodes:
-
-### Requirements Analyzer
-```
-┌─────────────────────────┐                          ┌─────────────────────────────┐
-│ Requirements Consistency│─────────────────────────▶│ User Acceptance Test        │
-│ Analyzer (Entry Point)  │                          │ Generator                   │
-└─────────────────────────┘                          └─────────────────────────────┘
-```
-
-### Software Design Agent
-```
-┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
-│ Design Generator    │────severity issues────────▶│  Design Validator   │
-│   (Entry Point)     │                            │  (Conditional Node) │
-└─────────────────────┘                            └─────────────────────┘
-```
-
-### C Code Analyzer
-```
-┌─────────────────────┐    Condition: No HIGH     ┌─────────────────────┐
-│ Automotive Analyzer │────severity violations───▶│  Unit Test Generator│
-│   (Entry Point)     │                           │  (Conditional Node) │
-└─────────────────────┘                           └─────────────────────┘
-```
-
-**Technical Stack:**
-- **Graph Pattern**: Strands GraphBuilder with conditional edges
-- **Authentication**: Amazon Cognito with JWT tokens
-- **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Model**: Anthropic Claude Haiku 4.5
-- **IDE Integration**: Model Context Protocol (MCP) servers
-
-## Project Structure
-
-```
-automotive-strands-agents-in-runtime/
-├── backend/                                    # Backend Agent Services
-│   ├── requirements-agent/                    # Requirements Analysis Agent
-│   │   ├── automotive_requirements_agent_notebook.ipynb
-│   │   ├── requirements_analyzer.py
-│   │   ├── utils.py
-│   │   ├── requirements.txt
-│   │   ├── Dockerfile
-│   │   └── README.md
-│   ├── design-agent/                          # Software Design Agent
-│   │   ├── automotive_design_agent_notebook.ipynb
-│   │   ├── design_generator.py
-│   │   ├── utils.py
-│   │   ├── requirements.txt
-│   │   ├── Dockerfile
-│   │   └── README.md
-│   └── c-code-analyzer-agent/                 # C Code Analysis Agent
-│       ├── sample_automotive_code/            # Sample C code for testing
-│       │   ├── tests/                         # Generated unit tests
-│       │   │   ├── test_sample_with_minor_violations.c
-│       │   │   ├── Makefile
-│       │   │   └── README.md
-│       │   ├── sample_with_severe_violations.c
-│       │   ├── sample_with_minor_violations.c
-│       │   ├── sample_automotive_compliant.c
-│       │   └── README.md
-│       ├── automotive_c_analyzer_notebook.ipynb
-│       ├── c_code_analyzer.py
-│       ├── utils.py
-│       ├── requirements.txt
-│       └── Dockerfile
-├── mcp-servers/                               # Model Context Protocol Servers
-│   ├── automotive-requirements-mcp/           # Requirements Analysis MCP Server
-│   │   ├── requirements-server.py
-│   │   ├── requirements.txt
-│   │   ├── test_config.py
-│   │   └── README.md
-│   ├── automotive-design-mcp/                 # Software Design MCP Server
-│   │   ├── design-server.py
-│   │   ├── requirements.txt
-│   │   ├── test_config.py
-│   │   └── README.md
-│   └── automotive-coding-mcp/                 # C Code Analysis MCP Server
-│       ├── coding-server.py
-│       ├── requirements.txt
-│       └── test_config.py
-├── ide-support/                               # IDE Integration Support
-│   ├── kiro/                                  # Kiro IDE Configuration
-│   │   ├── settings/mcp.json                  # MCP server configuration
-│   │   └── steering/                          # Agent steering rules
-│   │       ├── requirements-agent-mcp-tool-use.md
-│   │       ├── design-agent-mcp-tool-use.md
-│   │       └── analyze-c-code-mcp-tool-use.md
-│   ├── cline/                                 # Cline IDE Configuration
-│   │   └── cline_mcp_settings.json
-│   └── .amazonq/                              # Amazon Q Configuration
-│       └── agents/
-└── weather-app/                               # Sample Requirements Documents
-    ├── business-requirements/
-    │   └── weather_app_brd.md
-    └── technical-requirements/
-        ├── weather_app_srs.md
-        └── ieee_830_srs_outline.md
-
-## Key Features
-
-### Graph-Based Multi-Agent System
-- Uses Strands GraphBuilder for agent orchestration
-- Conditional sequential execution pattern with 2-node architecture
-- Automatic workflow control based on analysis results
-- Performance metrics and execution tracking
-- Structured responses with both analysis and generation results
-
-### IDE Integration via MCP
-- Real-time analysis directly in your IDE (Kiro, Cline, Amazon Q)
-- Automated unit test and UAT generation on-demand
-- Continuous automotive coding standards compliance checking
-- Seamless integration with development workflows
+- See respective README files for detailed instructions. 
 
 ## Getting Started
 
@@ -185,18 +55,10 @@ automotive-strands-agents-in-runtime/
 - Python 3.13+
 - AWS credentials configured
 - Amazon Bedrock AgentCore SDK access
-- UV package manager (for MCP servers): `pip install uv`
 
 ### C Code Analyzer Agent
 
 The C Code Analyzer provides automotive C code analysis with custom coding standards compliance checking and automated unit test generation.
-
-**Quick Start:**
-```bash
-cd backend/c-code-analyzer-agent
-pip install -r requirements.txt
-jupyter notebook automotive_c_analyzer_notebook.ipynb
-```
 
 For detailed setup instructions, sample test cases, and advanced usage, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
 
@@ -204,25 +66,11 @@ For detailed setup instructions, sample test cases, and advanced usage, see the 
 
 The Requirements Analyzer focuses on business and technical requirements analysis with user acceptance test generation.
 
-**Quick Start:**
-```bash
-cd backend/requirements-agent
-pip install -r requirements.txt
-jupyter notebook automotive_requirements_agent_notebook.ipynb
-```
-
 For detailed setup instructions, path configuration, and troubleshooting, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
 
 ### Software Design Agent
 
 The Software Design Agent transforms validated requirements into comprehensive technical design documents with conditional quality validation.
-
-**Quick Start:**
-```bash
-cd backend/design-agent
-pip install -r requirements.txt
-jupyter notebook automotive_design_agent_notebook.ipynb
-```
 
 For detailed setup instructions, design completeness analysis, and validation workflows, see the [Software Design Agent README](backend/design-agent/README.md).
 
@@ -247,8 +95,6 @@ For detailed setup instructions, design completeness analysis, and validation wo
 - `mcp_automotive_requirements_automotive_requirements_analyzer` - Analyze requirements documents
 - `mcp_automotive_design_automotive_design_generator` - Generate technical design from requirements
 - `mcp_automotive_coding_analyze_c_code` - Analyze C code for automotive standards
-
-## Sample Test Cases
 
 ### Requirements Analysis  
 The Requirements Analyzer works with sample business and technical requirements documents located in `weather-app/`. For detailed information about requirements analysis workflows and test case generation, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
@@ -316,21 +162,6 @@ The three-agent workflow follows a sequential process from requirements to code:
 1. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` to validate business and technical requirements
 2. **Design Generation**: Use `#mcp_automotive_design_automotive_design_generator` to generate technical design documents from validated requirements
 3. **Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` to analyze C code implementation against design specifications
-
-### Testing Your Setup
-```bash
-# Test Requirements Analysis MCP Server  
-cd mcp-servers/automotive-requirements-mcp
-python test_config.py
-
-# Test Software Design MCP Server
-cd mcp-servers/automotive-design-mcp
-python test_config.py
-
-# Test C Code Analysis MCP Server
-cd mcp-servers/automotive-coding-mcp
-python test_config.py
-```
 
 ## Next Steps
 

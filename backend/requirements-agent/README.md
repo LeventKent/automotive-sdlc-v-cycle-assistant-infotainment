@@ -1,6 +1,26 @@
-# Backend - Automotive Requirements Analyzer
+# Automotive Requirements Analyzer and UAT Generator
 
-This folder contains the backend implementation of the automotive requirements analyzer system.
+The Requirements Analyzer transforms requirements documents into consistency analysis reports and comprehensive user acceptance test specifications for automotive software development.
+
+The automotive requirements analyzer and user acceptance test generator is implemented using Strands Agents framework and deployed on Amazon Bedrock AgentCore Runtime. 
+
+
+## Architecture
+
+```
+┌─────────────────┐    ┌──────────────────────────┐             ┌─────────────────┐
+│   MCP Client    │───▶│  AgentCore Runtime       │──generates─▶│  Analysis &     │
+│(requirements-   │    │  Requirements Agent      │             │  User Acceptance│
+│    server)      │    │  (Strands)               │             │  Tests          │
+└─────────────────┘    └──────────────────────────┘             └─────────────────┘
+```
+
+- **Agent**: Requirements analysis and UAT generation
+- **Framework**: Strands Agents with AgentCore Runtime
+- **Authentication**: Amazon Cognito with JWT tokens
+- **Runtime**: Amazon Bedrock AgentCore Runtime
+- **Models**: Claude 4.5 Haiku for analysis and test generation
+- **Output**: Consistency reports and user acceptance test specifications
 
 ## Files
 
@@ -9,26 +29,6 @@ This folder contains the backend implementation of the automotive requirements a
 - `utils.py` - Utility functions for Cognito authentication and user pool management
 - `requirements.txt` - Python dependencies for the backend system
 
-## Usage
-
-### Running the Notebook
-
-1. Navigate to the backend directory:
-   ```bash
-   cd automotive-strands-agents-in-runtime/backend
-   ```
-
-2. Run steps in the Jupyter Notebook:
-   ```bash
-   jupyter notebook automotive_requirements_agent_notebook.ipynb
-   ```
-   Execute the notebook cells (automatically installs dependencies from requirements.txt)
-
-3. Copy MCP configuration for requirements-agent (if not done already):
-   ```bash
-   cp ide-support/kiro/settings/mcp.json .kiro/settings/mcp.json
-   ```
-4. Validate in Kiro that the MCP server automotive-requirements is running correctly.
 
 ### Path Configuration
 
@@ -56,12 +56,26 @@ automotive-strands-agents-in-runtime/
 4. **Authentication**: Integrated with Amazon Cognito for secure access
 5. **User Acceptance Tests**: Generates comprehensive test specifications
 
-### Dependencies
 
-- `strands-agents` - Multi-agent framework
-- `boto3` - AWS SDK for Python
-- `bedrock-agentcore` - Amazon Bedrock AgentCore SDK
-- `jupyter` - Notebook environment
+## Quick Start
+
+### Prerequisites
+- Python 3.13+
+- AWS CLI configured
+- Amazon Bedrock access
+- AgentCore Runtime permissions
+
+### 1. Deploy Infrastructure
+Run notebook cells. This will deploy the agent to the agentcore runtime.
+
+### 2. Adjust the Settings/Steering Files for Local IDE
+- For Kiro, copy the configuration files from `.ide-support/kiro`. 
+- For Cline, use `./ide-support/cline`.
+- Adjust the Cognito Client-Id from your deployment from step 1.
+- Adjust your local path to the `requirements-server.py` if necessary.
+- Adjust your local Python if necessary.
+
+
 
 ### Troubleshooting
 
@@ -69,8 +83,7 @@ If you encounter deployment issues:
 
 1. Ensure all dependencies are installed
 2. Check AWS credentials are configured
-3. Verify Docker is running for AgentCore deployment
-4. Review the notebook output for specific error messages
+3. Review the notebook output for specific error messages
 
 For 424 "Failed Dependency" errors, the issue is typically related to:
 - Missing dependencies in requirements.txt
