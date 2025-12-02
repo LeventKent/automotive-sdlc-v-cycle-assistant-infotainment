@@ -100,7 +100,7 @@ def automotive_design_generator(payload):
         # Validate mandatory inputs
         if not srs_documents:
             error_response = {
-                "error": "No SRD documents provided",
+                "error": "No SRS documents provided",
                 "message": "The 'srs_documents' field is required in the payload"
             }
             print(f"[ERROR] {error_response['error']}")

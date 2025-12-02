@@ -228,7 +228,7 @@ class AutomotiveDesignAgent:
                 url,
                 headers=headers,
                 data=json.dumps(payload),
-                timeout=600
+                timeout=900
             )
             
             logger.info(f"AgentCore API response status: {response.status_code}")

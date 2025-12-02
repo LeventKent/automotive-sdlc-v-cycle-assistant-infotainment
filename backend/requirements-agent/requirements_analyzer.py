@@ -23,13 +23,12 @@ app = BedrockAgentCoreApp()
 
 # Requirements analysis tool
 @tool
-def analyze_requirements_consistency(requirements_docs: str) -> dict:
+def check_for_incomplete_requirements(requirements_docs: str) -> dict:
     """
     Analyzes business requirements documents for consistency, completeness, and quality.
     Returns a dictionary with issue severity and details.
     """
     issues = []
-    severity_level = "LOW"
     
     # Automotive requirements analysis checks based on BRD structure
     analysis_patterns = {
@@ -64,12 +63,6 @@ def analyze_requirements_consistency(requirements_docs: str) -> dict:
                 "severity": pattern_info["severity"],
                 "occurrences": len(matches)
             })
-            
-            # Update overall severity
-            if pattern_info["severity"] == "HIGH":
-                severity_level = "HIGH"
-            elif pattern_info["severity"] == "MEDIUM" and severity_level != "HIGH":
-                severity_level = "MEDIUM"
     
     # Count severity levels
     high_count = sum(1 for issue in issues if issue["severity"] == "HIGH")
@@ -77,7 +70,6 @@ def analyze_requirements_consistency(requirements_docs: str) -> dict:
     low_count = sum(1 for issue in issues if issue["severity"] == "LOW")
     
     return {
-        "overall_severity": severity_level,
         "issues": issues,
         "total_issues": len(issues),
         "ready_for_development": high_count == 0,
@@ -90,14 +82,14 @@ def analyze_requirements_consistency(requirements_docs: str) -> dict:
 
 
 # Create the model for all agents
-model_id = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
-model = BedrockModel(model_id=model_id, )
+model_id = "us.amazon.nova-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0"
+model = BedrockModel(model_id=model_id, max_tokens=5000)
 
 # Create the requirements analyzer agent
 requirements_analyzer_agent = Agent(
     name="requirements_analyzer",
     model=model,
-    tools=[analyze_requirements_consistency],
+    tools=[check_for_incomplete_requirements],
     system_prompt="""You are an automotive requirements analyst specializing in vehicle infotainment and safety systems. Your job is to:
 
 1. Analyze automotive requirements documents (BRDs) for consistency, completeness, and quality
@@ -110,14 +102,13 @@ requirements_analyzer_agent = Agent(
    - Business drivers with success metrics
    - Safety and security considerations
 
-IMPORTANT: Always use the analyze_requirements_consistency tool first to perform the technical analysis, extend it with your expert knowledge if needed,then provide your overall assessment.
+IMPORTANT: Always use the check_for_incomplete_requirements tool to check if there are any missing content. Then use your expert knowledge to provide an overall assessment.
 
 In your response, clearly state:
 - **Overall Severity**: [LOW/MEDIUM/HIGH]
 - **Ready for Development**: [YES/NO] 
 - **Safety Assessment**: Any driver distraction or safety concerns
-- **Completeness Score**: Percentage of required sections present
-- **Recommendation**: Whether requirements are suitable for user acceptance test generation
+- **Completeness Score**: Percentage of required sections present.
 
 Focus on automotive safety standards, driver distraction guidelines, and development readiness. Provide specific, actionable feedback for improvement."""
 )
@@ -129,7 +120,7 @@ uat_generator_agent = Agent(
     name="uat_generator",
     model=model,
     system_prompt="""You are a user acceptance test generator for automotive applications. Your job is to:
-1. Generate a minimal set of user acceptance tests based on requirements
+1. Generate user acceptance tests based on requirements
 2. Follow automotive testing standards
 
 Generate clean, well-documented test specifications that can be easily executed by test teams."""

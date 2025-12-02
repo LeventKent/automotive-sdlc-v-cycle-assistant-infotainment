@@ -8,6 +8,7 @@ import logging
 import os
 import time
 import urllib.parse
+import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional, Annotated
 
@@ -79,7 +80,7 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         config = {
             "agent_id": bedrock_config.get('agent_id'),
             "agent_arn": bedrock_config.get('agent_arn'),
-            "agent_session_id": bedrock_config.get('agent_session_id'),
+            "agent_session_id": str(uuid.uuid4()),
             "region": aws_config.get('region', 'us-west-2'),
             "authorizer_configuration": auth_config
         }
@@ -219,7 +220,7 @@ class AutomotiveRequirementsAgent:
                 url,
                 headers=headers,
                 data=json.dumps(payload),
-                timeout=900
+                timeout=1800  # 30 minutes timeout
             )
             
             logger.info(f"AgentCore API response status: {response.status_code}")

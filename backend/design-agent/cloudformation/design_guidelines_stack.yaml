@@ -164,11 +164,9 @@ Resources:
                   bucket_name = os.environ['BUCKET_NAME']
                   
                   if toolName == 'get_technical_guidelines':
-                      return get_technical_guidelines(bucket_name, event.get('guideline_type', 'general'))
+                      return get_technical_guidelines(bucket_name)
                   elif toolName == 'list_available_guidelines':
                       return list_available_guidelines(bucket_name)
-                  elif toolName == 'get_guideline_by_category':
-                      return get_guideline_by_category(bucket_name, event.get('category', 'architecture'))
                   else:
                       return {
                           'statusCode': 400,
@@ -181,18 +179,11 @@ Resources:
                       'body': json.dumps({'error': str(e)})
                   }
 
-          def get_technical_guidelines(bucket_name, guideline_type):
+          def get_technical_guidelines(bucket_name, guideline_type=None):
               """Get technical design guidelines from S3"""
               try:
-                  # Map guideline types to S3 keys
-                  guideline_files = {
-                      'general': 'technical-design-guidelines.md',
-                      'automotive': 'automotive-specific-guidelines.md',
-                      'safety': 'safety-guidelines.md',
-                      'performance': 'performance-guidelines.md'
-                  }
-                  
-                  file_key = guideline_files.get(guideline_type, 'technical-design-guidelines.md')
+                  # Default to general guidelines if no type specified
+                  file_key = 'technical-design-guidelines.md'
                   
                   response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
                   content = response['Body'].read().decode('utf-8')
@@ -200,7 +191,6 @@ Resources:
                   return {
                       'statusCode': 200,
                       'body': json.dumps({
-                          'guideline_type': guideline_type,
                           'content': content,
                           'file_key': file_key
                       })
@@ -246,40 +236,6 @@ Resources:
                       'body': json.dumps({'error': str(e)})
                   }
 
-          def get_guideline_by_category(bucket_name, category):
-              """Get guidelines filtered by category"""
-              try:
-                  # This is a simplified implementation
-                  # In practice, you might have more sophisticated categorization
-                  category_files = {
-                      'architecture': 'technical-design-guidelines.md',
-                      'safety': 'safety-guidelines.md',
-                      'performance': 'performance-guidelines.md',
-                      'security': 'security-guidelines.md'
-                  }
-                  
-                  file_key = category_files.get(category, 'technical-design-guidelines.md')
-                  
-                  response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
-                  content = response['Body'].read().decode('utf-8')
-                  
-                  return {
-                      'statusCode': 200,
-                      'body': json.dumps({
-                          'category': category,
-                          'content': content,
-                          'file_key': file_key
-                      })
-                  }
-              
-              except ClientError as e:
-                  if e.response['Error']['Code'] == 'NoSuchKey':
-                      return {
-                          'statusCode': 404,
-                          'body': json.dumps({'error': f'Category guideline not found: {category}'})
-                      }
-                  else:
-                      raise e
 
 
   # IAM Role for Lambda function

@@ -7,7 +7,7 @@ When a user asks for the generation of technical designs using an SRS and a BRD 
 
 ## Processing Steps
 
-1. Construct the payload using the absolute file paths
+1. Construct the payload using the absolute file paths (use pwd tool)
 
 2. Call the automotive design generator tool
 
@@ -25,6 +25,9 @@ When a user asks for the generation of technical designs using an SRS and a BRD 
    - Use format: `{project_name}_technical_design.md`
 
 7. **Save Document**: Write the complete technical design document to the determined location with the generated filename.
+   - **Important**: Break large documents into chunks (first 50 lines with `fsWrite`, then use `fsAppend` for remaining content)
+   - Process the entire document content without truncation
+   - Ensure all sections from the MCP tool output are preserved
 
 8. **Provide Confirmation**: Inform the user of the save location and filename.
 

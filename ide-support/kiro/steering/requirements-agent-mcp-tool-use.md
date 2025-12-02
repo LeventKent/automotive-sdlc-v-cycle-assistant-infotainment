@@ -6,7 +6,7 @@ When a user asks for requirements analysis using requirements documents (such as
 
 ## Processing Steps
 
-1. Construct the payload using the absolute file path
+1. Construct the payload using the absolute file path (use pwd tool)
 
 2. Call the automotive requirements analyzer tool
 
@@ -22,7 +22,7 @@ When a user asks for requirements analysis using requirements documents (such as
 
 6. **Determine Save Location for UAT**: Save the user acceptance tests using this priority order:
    - If existing user acceptance test files or directories exist, save there
-   - If a project-specific test directory exists (e.g., `*/tests/` or `*/user-acceptance-tests/`), save there
+   - If a project-specific test directory exists (e.g., `*/uat/` or `*/user-acceptance-tests/`), save there
    - If a project root directory is identifiable, create a `user-acceptance-tests/` subdirectory
    - Otherwise, save in the current working directory under `user-acceptance-tests/`
 
@@ -32,6 +32,9 @@ When a user asks for requirements analysis using requirements documents (such as
    - Use format: `{project_name}_user_acceptance_tests.md` for UAT
 
 8. **Save Documents**: Write both the requirements analysis and user acceptance test documents to their determined locations.
+   - **Important**: Break large documents into chunks (first 50 lines with `fsWrite`, then use `fsAppend` for remaining content)
+   - Process the entire document content without truncation
+   - Ensure all sections from the MCP tool output are preserved
 
 9. **Provide Confirmation**: Inform the user of both save locations and filenames.
 
@@ -40,8 +43,8 @@ When a user asks for requirements analysis using requirements documents (such as
 ```
 User: "Analyze requirements for weather app using weather_app_requirements.md"
 → Kiro calls MCP tool supplying requirements document content
-→ MCP tool generates analysis and UAT
-→ Kiro detects JSON output with requirements analysis and UAT content
+→ MCP tool generates analysis report and UAT
+→ Kiro detects JSON output with analysis report and UAT content
 → Kiro saves analysis to: weather-app/requirements-analysis/weather_app_requirements_analysis.md
 → Kiro saves UAT to: weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md
 → Kiro confirms: "Requirements analysis saved to weather-app/requirements-analysis/weather_app_requirements_analysis.md and UAT saved to weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md"

@@ -5,6 +5,7 @@ from boto3.session import Session
 import botocore
 from botocore.exceptions import ClientError
 import requests
+import os
 
 USER_NAME = "testuser"
 PASSWORD = "MyPassword123!"
@@ -12,7 +13,7 @@ TEMP_ADMIN_PASSWORD = "Temp123!"
 
 
 def setup_cognito_user_pool():
-    boto_session = Session()
+    boto_session = Session(profile_name=os.environ.get('AWS_PROFILE'))
     region = boto_session.region_name
     # Initialize Cognito client
     cognito_client = boto3.client("cognito-idp", region_name=region)
