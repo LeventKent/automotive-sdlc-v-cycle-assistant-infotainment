@@ -23,10 +23,19 @@ app = BedrockAgentCoreApp()
 
 # Requirements analysis tool
 @tool
-def check_for_incomplete_requirements(requirements_docs: str) -> dict:
+def check_for_incomplete_requirements(requirements_doc_content: str) -> dict:
     """
     Analyzes business requirements documents for consistency, completeness, and quality.
-    Returns a dictionary with issue severity and details.
+    
+    Args:
+        requirements_doc_content: The FULL TEXT CONTENT of the requirements document(s) to analyze.
+    
+    Returns:
+        A dictionary with issue severity and details including:
+        - issues: List of identified issues with type, description, severity, and occurrences
+        - total_issues: Total count of issues found
+        - ready_for_development: Boolean indicating if requirements are ready
+        - severity_counts: Breakdown of issues by severity level (high, medium, low)
     """
     issues = []
     
@@ -46,16 +55,11 @@ def check_for_incomplete_requirements(requirements_docs: str) -> dict:
             "pattern": r"\b(TODO|ToDo|TBD|To be determined|PLACEHOLDER|XXX)\b",
             "description": "Requirements contain incomplete or placeholder items",
             "severity": "HIGH"
-        },
-       # "Missing Acceptance Criteria": {
-       #     "pattern": r"(?i)(?:FR-\d+|functional requirement)(?!.*acceptance criteria)",
-       #     "description": "Functional requirements should include clear acceptance criteria",
-       #     "severity": "HIGH"
-       # }
+        }
     }
     
     for issue_type, pattern_info in analysis_patterns.items():
-        matches = re.findall(pattern_info["pattern"], requirements_docs, re.MULTILINE | re.IGNORECASE)
+        matches = re.findall(pattern_info["pattern"], requirements_doc_content, re.MULTILINE | re.IGNORECASE)
         if matches:
             issues.append({
                 "issue_type": issue_type,

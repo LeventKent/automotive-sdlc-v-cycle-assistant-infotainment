@@ -163,8 +163,8 @@ Resources:
                       toolName = toolName[toolName.index(delimiter) + len(delimiter):]
                   bucket_name = os.environ['BUCKET_NAME']
                   
-                  if toolName == 'get_technical_guidelines':
-                      return get_technical_guidelines(bucket_name)
+                  if toolName == 'get_technical_guideline':
+                      return get_technical_guideline(bucket_name)
                   elif toolName == 'list_available_guidelines':
                       return list_available_guidelines(bucket_name)
                   else:
@@ -179,7 +179,7 @@ Resources:
                       'body': json.dumps({'error': str(e)})
                   }
 
-          def get_technical_guidelines(bucket_name, guideline_type=None):
+          def get_technical_guideline(bucket_name, guideline_type=None):
               """Get technical design guidelines from S3"""
               try:
                   # Default to general guidelines if no type specified

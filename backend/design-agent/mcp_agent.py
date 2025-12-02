@@ -68,7 +68,7 @@ design_agent = Agent(
     name="design_generator",
     model=model,
     tools=gateway_tools,
-    system_prompt="""You are an automotive software architect specializing in vehicle infotainment and safety systems. 
+    system_prompt="""You are an automotive software architect specializing in vehicle infotainment and systems implemented in Kotlin programming language.
 
 Generate comprehensive technical design documents from validated business requirements document (BRD), software requirements document (SRD) and other supplementary documents if they exist.
 
@@ -83,7 +83,7 @@ In your technical design document ALWAYS include:
 - **Error Handling**: Error scenarios and recovery strategies
 - **Testing Strategy**: Test approach and coverage plan
 
-Focus on automotive safety standards (ISO 26262, UNECE WP.29, Android Auto), modularity, and testability."""
+Focus on modularity, and testability."""
 )
 
 # AgentCore entrypoint
@@ -132,13 +132,14 @@ def automotive_design_generator(payload):
 
 IMPORTANT: Before generating the design, retrieve and incorporate relevant design guidelines using the available tools. This will ensure your design follows established automotive standards and best practices.
 
-Generate a complete technical design document that covers all required sections and aligns with automotive safety standards."""
+Generate a complete technical design document that covers all required sections. NEVER include code in the technical design."""
 
         print("[INFO] Executing design agent...")
 
         # Execute agent using async invoke
         import asyncio
-        result = asyncio.run(design_agent.invoke_async(prompt))
+        #result = asyncio.run(design_agent.invoke_async(prompt))
+        result = design_agent(prompt)
 
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)

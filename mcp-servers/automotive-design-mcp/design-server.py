@@ -8,6 +8,7 @@ import logging
 import os
 import time
 import urllib.parse
+import uuid
 from typing import Any, Dict, Optional, Annotated
 
 import boto3
@@ -78,7 +79,7 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         config = {
             "agent_id": bedrock_config.get('agent_id'),
             "agent_arn": bedrock_config.get('agent_arn'),
-            "agent_session_id": bedrock_config.get('agent_session_id'),
+            "agent_session_id": str(uuid.uuid4()),
             "region": aws_config.get('region', 'us-west-2'),
             "authorizer_configuration": auth_config
         }
@@ -90,7 +91,6 @@ def load_agent_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
         
         # Generate a session ID if not provided
         if not config["agent_session_id"]:
-            import uuid
             config["agent_session_id"] = str(uuid.uuid4())
             logger.info(f"Generated new agent_session_id: {config['agent_session_id']}")
         

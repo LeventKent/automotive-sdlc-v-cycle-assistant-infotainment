@@ -220,7 +220,7 @@ class AutomotiveRequirementsAgent:
                 url,
                 headers=headers,
                 data=json.dumps(payload),
-                timeout=1800  # 30 minutes timeout
+                timeout=900
             )
             
             logger.info(f"AgentCore API response status: {response.status_code}")
