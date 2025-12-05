@@ -26,9 +26,9 @@ REGION = boto_session.region_name
 # This wrapper makes our agent deployable to AgentCore
 app = BedrockAgentCoreApp()
 
-model_id = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+model_id = "us.amazon.nova-2-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0"
 model = BedrockModel(
-    model_id=model_id,
+    model_id=model_id, max_tokens=40000
 )
 
 def get_token(user_pool_id: str, client_id: str, client_secret: str, scope_string: str, REGION: str) -> dict:

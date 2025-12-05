@@ -585,3 +585,21 @@ def create_gateway_lambda(lambda_function_code_path) -> dict[str, int]:
                 return_resp['lambda_function_arn'] = error_message
 
     return return_resp
+
+
+def delete_gateway(gateway_client,gatewayId): 
+    print("Deleting all targets for gateway", gatewayId)
+    list_response = gateway_client.list_gateway_targets(
+            gatewayIdentifier = gatewayId,
+            maxResults=100
+    )
+    for item in list_response['items']:
+        targetId = item["targetId"]
+        print("Deleting target ", targetId)
+        gateway_client.delete_gateway_target(
+            gatewayIdentifier = gatewayId,
+            targetId = targetId
+        )
+        time.sleep(5)
+    print("Deleting gateway ", gatewayId)
+    gateway_client.delete_gateway(gatewayIdentifier = gatewayId)

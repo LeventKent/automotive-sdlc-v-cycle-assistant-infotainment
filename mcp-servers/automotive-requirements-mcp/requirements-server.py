@@ -249,13 +249,13 @@ class AutomotiveRequirementsAgent:
 agent = AutomotiveRequirementsAgent()
 
 @mcp.tool(
-    description="Analyze automotive requirements documents for consistency and generate user acceptance tests. Supply absolute file paths of documents to analyze."
+    description="Analyze automotive business requirements documents for consistency and generate user acceptance tests. Supply absolute file paths of documents to analyze."
 )
 def automotive_requirements_analyzer(
-    requirements_docs: Annotated[str, "Absolute file path to the requirements documents (BRD, PRD, etc.) to analyze for consistency and UAT generation"]
+    requirements_docs: Annotated[str, "Absolute file path to the business requirements documents (BRD) to analyze for consistency and UAT generation"]
 ) -> str:
     """
-    Analyze automotive requirements documents for consistency and generate user acceptance tests.
+    Analyze automotive business requirements documents for consistency and generate user acceptance tests.
     
     This tool implements a multi-step automotive requirements analyzer using agent graph with:
     1. Requirements Consistency Analysis (checks for completeness, quality, and automotive standards)
@@ -266,7 +266,7 @@ def automotive_requirements_analyzer(
     Parameters
     ----------
     requirements_docs : str
-        Absolute file path to the requirements documents (BRD, PRD, etc.) to analyze for consistency and UAT generation
+        Absolute file path to the business requirements documents (BRD) to analyze for consistency and UAT generation
     
     Returns
     -------
@@ -279,7 +279,7 @@ def automotive_requirements_analyzer(
     Examples
     --------
     >>> result = automotive_requirements_analyzer(
-    ...     requirements_docs="/path/to/requirements.md"
+    ...     requirements_docs="/path/to/requirements_brd.md"
     ... )
     """
     if not requirements_docs.strip():

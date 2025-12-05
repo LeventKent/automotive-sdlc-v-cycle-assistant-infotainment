@@ -16,6 +16,7 @@ from strands.multiagent import GraphBuilder
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 import json
 import re
+import traceback
 from datetime import datetime
 from typing import Dict, Any
 
@@ -86,8 +87,10 @@ def check_for_incomplete_requirements(requirements_doc_content: str) -> dict:
 
 
 # Create the model for all agents
-model_id = "us.amazon.nova-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0"
-model = BedrockModel(model_id=model_id, max_tokens=5000)
+model_id = "us.amazon.nova-2-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0"
+model = BedrockModel(
+    model_id=model_id, max_tokens=40000
+)
 
 # Create the requirements analyzer agent
 requirements_analyzer_agent = Agent(
@@ -209,6 +212,8 @@ Please use the analyze_requirements_consistency tool to analyze the requirements
         
     except Exception as e:
         print(f"Error during graph execution: {e}")
+        print("Full stack trace:")
+        traceback.print_exc()
         return {
             "error": f"Graph execution failed: {str(e)}",
             "step1_requirements_analysis": {"analysis": "Analysis failed", "issues": []},
