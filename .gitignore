@@ -86,3 +86,6 @@ cdk.out
 
 # Bedrock AgentCore 
 .bedrock_agentcore.yaml
+
+# Kiro workspace settings
+.kiro/settings/
