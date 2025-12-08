@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Weather App Specific -->
     <string name="app_name">Weather</string>
-    <string name="hello_world">Hello, Android Automotive!</string>
+    <string name="weather_loading">Loading weather…</string>
+    <string name="weather_error_api">Unable to fetch weather data</string>
+    <string name="weather_refresh">Refresh Weather</string>
+    
+    <!-- Generic Automotive Strings (Reusable) -->
+    <string name="car_loading">Loading…</string>
+    <string name="car_error_generic">Something went wrong</string>
+    <string name="car_error_network">Network error. Please check your connection.</string>
+    <string name="car_error_location">Unable to get location</string>
 </resources>
