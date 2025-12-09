@@ -2,9 +2,6 @@
 <resources>
     <!-- Weather App Specific -->
     <string name="app_name">Weather</string>
-    <string name="weather_loading">Loading weather…</string>
-    <string name="weather_error_api">Unable to fetch weather data</string>
-    <string name="weather_refresh">Refresh Weather</string>
     
     <!-- Generic Automotive Strings (Reusable) -->
     <string name="car_loading">Loading…</string>
