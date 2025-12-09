@@ -41,6 +41,8 @@ and define the `ANDROID_HOME` environment variable:
 ```bash
 echo 'export ANDROID_HOME="$(brew --prefix)/share/android-commandlinetools"' >> ~/.profile
 ```
+and double-check the path and adjust [local.properties](./android-auto/local.properties) file if needed
+
 
 4. (_Optional_) Accept all Android licenses so as not to be prompted in future instructions:
 ```bash
@@ -103,6 +105,7 @@ and define the `ANDROID_HOME` environment variable:
 ```bash
 echo 'export ANDROID_HOME="$(brew --prefix)/share/android-commandlinetools"' >> ~/.profile
 ```
+and double-check the path and adjust [local.properties](./android-auto/local.properties) file if needed
 
 4. (_Optional_) Accept all Android licenses so as not to be prompted in future instructions:
 ```bash
@@ -144,6 +147,8 @@ Note: `emulator` supported multiple arguments to control the behavior and intera
 2. Install OpenJDK 17 using the following [link](https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_windows-x64_bin.zip).
 
 3. Edit the user environment variables to define the `ANDROID_HOME` and `JAVA_HOME` environment variables. Additionally update the `PATH` environment variable to include the path `$ANDROID_HOME\cmdline-tools\latest\bin`.
+
+Double-check the path and adjust [local.properties](./android-auto/local.properties) file if needed
 
 4. (_Optional_) Accept all Android licenses so as not to be prompted in future instructions:
 ```bash
