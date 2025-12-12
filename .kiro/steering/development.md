@@ -6,7 +6,7 @@ inclusion: always
 
 ## Spec-Driven Development Workflow
 
-When creating specifications, requirements, design documents, or implementation tasks, always reference and align with:
+When doing spec-driven development or implementing, always reference and align with:
 
 - **Business Requirements Document (BRD)** - Contains stakeholder needs and business objectives
 - **Software Requirements Specification (SRS)** - Defines functional and non-functional requirements

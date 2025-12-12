@@ -1,5 +1,15 @@
 # Prompts for Demo using Kiro Spec-Driven Development Workflow
 
+## Analyze Requirements & Generate User Acceptance Tests (Kiro IDE)
+```
+analyze business requirements of weather-app
+```
+
+## Generate Technical Designs (Kiro IDE)
+```
+generate technical design for weather-app
+```
+
 ## Create Spec for first Weather App iteration (Kiro IDE)
 ```
 Implement a first version of the weather app focused on:
