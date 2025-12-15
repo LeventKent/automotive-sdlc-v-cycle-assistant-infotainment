@@ -13,8 +13,8 @@ An example of a navigation flow with Kiro following the numbering in the diagram
 5. AgentCore Runtime uses Amazon Cognito to authenticate the user.
 6. AgentCore Runtime utilizes the multi-agent workflow implemented in Strands to generates a requirements analysis report and user acceptance tests. The analysis report and user acceptance test document are saved in the workspace. Note that the model for each of these steps can be chosen according to the specific task and does not have to be the same.
 7. After the developer reviews/adjusts the documents, the user may want to generate technical designs. Upon prompting "generate technical design for weather-app", this time Kiro calls the technical design generator which delegates to respective AgentCore Runtime endpoint.
-8. After authentication via Cognito, technical design generator agent calls "Guidelines & Components" MCP tool hosted in AgentCore Gateway.
-9. Agent retrieves the technical guidelines and documentation of base components and generates the technical design. The technical design is saved in the workspace.
+8. After authentication via Cognito, technical design generator agent calls Guidelines MCP tool hosted in AgentCore Gateway.
+9. Agent retrieves the technical guidelines located in the S3 bucket and generates the technical design and sends it back to Kiro. Kiro saves the document in the local workspace.
 10. Now developer can make use of Kiro to initiate a spec driven development based on requirements and tech. design. This results in respective specs documents. After the review of the developer, Kiro goes forward with code generation and validates the implementation using the integrated Android Simulator. In case of problems the agent is able to iterate and fix the code iteratively until the application is fully developed.
 
 
