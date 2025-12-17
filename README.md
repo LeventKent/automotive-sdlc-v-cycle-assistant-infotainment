@@ -1,6 +1,12 @@
-# Automotive Multi-Agent Analysis System
+# Agentic Automotive V-Cycle Assistant
 
-This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication, plus Model Context Protocol (MCP) servers for IDE integration.
+In this demo we are showcasing an a agentic V-Cycle assistant based on Kiro and Bedrock AgentCore, where an Android Weather-App is implemented based on the requirements.
+
+Demo Flow:
+
+- Kiro makes use of Strands impl. hosted on Bedrock AgentCore (exposed as MCP endpoints to Kiro) to handle requirements analysis, user acceptance test generation and technical design generation
+- Kiro IDE used to do spec driven dev. to decompose tasks based on 1).
+- Kiro-CLI is used to iterate over coding, testing and deployment via Android emulators.
 
 ![V-Cycle Assistant Architecture Diagram](./images/v-cycle-assistant-arch-diagram.png)
 
