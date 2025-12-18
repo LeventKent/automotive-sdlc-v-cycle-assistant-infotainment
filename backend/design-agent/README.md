@@ -47,7 +47,7 @@ The automotive technical design generator is implemented using Strands Agents fr
 - **IAM Roles**: Proper permissions for AgentCore and Gateway
 - **Cognito Integration**: JWT-based authentication
 
-## Quick Start
+## Getting Started
 
 ### Prerequisites
 - Python 3.13+

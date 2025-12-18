@@ -19,15 +19,15 @@ The automotive requirements analyzer and user acceptance test generator is imple
 - **Framework**: Strands Agents with AgentCore Runtime
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Models**: Claude 4.5 Haiku for analysis and test generation
-- **Output**: Consistency reports and user acceptance test specifications
+- **Model**: Nova 2 Lite for analysis and test generation
+- **Output**: Requirements validation report and user acceptance test specifications
 
 ## Files
 
 - `automotive_requirements_agent_notebook.ipynb` - Main Jupyter notebook demonstrating the multi-agent system
 - `requirements_analyzer.py` - Full Strands-based requirements analyzer implementation
 - `utils.py` - Utility functions for Cognito authentication and user pool management
-- `requirements.txt` - Python dependencies for the backend system
+- `requirements.txt` - Python dependencies for the agent to be deployed to AgentCore Runtime.
 
 
 ### Path Configuration
@@ -56,8 +56,7 @@ automotive-strands-agents-in-runtime/
 4. **Authentication**: Integrated with Amazon Cognito for secure access
 5. **User Acceptance Tests**: Generates comprehensive test specifications
 
-
-## Quick Start
+## Getting Started
 
 ### Prerequisites
 - Python 3.13+
@@ -69,11 +68,11 @@ automotive-strands-agents-in-runtime/
 Run notebook cells. This will deploy the agent to the agentcore runtime.
 
 ### 2. Adjust the Settings/Steering Files for Local IDE
-- For Kiro, copy the configuration files from `.ide-support/kiro`. 
+- For Kiro, use the default setup in the workspace (`./kiro` folder). 
 - For Cline, use `./ide-support/cline`.
 - Adjust the Cognito Client-Id from your deployment from step 1.
 - Adjust your local path to the `requirements-server.py` if necessary.
-- Adjust your local Python if necessary.
+- Adjust your Python path if necessary.
 
 
 
