@@ -1,6 +1,12 @@
-# Automotive Multi-Agent Analysis System
+# Agentic Automotive V-Cycle Assistant
 
-This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication, plus Model Context Protocol (MCP) servers for IDE integration.
+In this demo we are showcasing an a agentic V-Cycle assistant based on Kiro and Bedrock AgentCore, where an Android Weather-App is implemented based on the requirements.
+
+Demo Flow:
+
+- Kiro makes use of Strands impl. hosted on Bedrock AgentCore (exposed as MCP endpoints to Kiro) to handle requirements analysis, user acceptance test generation and technical design generation
+- Kiro IDE used to do spec driven dev. to decompose tasks based on 1).
+- Kiro-CLI is used to iterate over coding, testing and deployment via Android emulators.
 
 ![V-Cycle Assistant Architecture Diagram](./images/v-cycle-assistant-arch-diagram.png)
 
@@ -16,9 +22,6 @@ An example of a navigation flow with Kiro following the numbering in the diagram
 8. After authentication via Cognito, technical design generator agent calls Guidelines MCP tool hosted in AgentCore Gateway.
 9. Agent retrieves the technical guidelines located in the S3 bucket and generates the technical design and sends it back to Kiro. Kiro saves the document in the local workspace.
 10. Now developer can make use of Kiro to initiate a spec driven development based on requirements and tech. design. This results in respective specs documents. After the review of the developer, Kiro goes forward with code generation and validates the implementation using the integrated Android Simulator. In case of problems the agent is able to iterate and fix the code iteratively until the application is fully developed.
-
-
-
 
 
 ## Components
@@ -164,8 +167,7 @@ The project includes MCP servers for seamless IDE integration:
 
 ### IDE Support
 - **Kiro**: Full MCP integration with steering rules and settings
-- **Cline**: MCP configuration for automotive analysis tools
-- **Amazon Q**: Agent configuration for automotive workflows
+- **Cline**: Simple MCP configuration for automotive tools
 
 ### Benefits of MCP Integration
 - **Real-time Analysis**: Analyze code and requirements directly in your IDE
@@ -180,10 +182,6 @@ The three-agent workflow follows a sequential process from requirements to code:
 
 1. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` to validate business and technical requirements
 2. **Design Generation**: Use `#mcp_automotive_design_automotive_design_generator` to generate technical design documents from validated requirements
-3. **Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` to analyze C code implementation against design specifications
-
-## Next Steps
-
-- **Android Code Generation Coverage**: Generate code/unit tests for Android. Validate via simulator
-- **Enhanced Design Validation**: Add visual design tools and interactive architecture diagrams
-- **Code Generation Integration**: Generate code scaffolding directly from design documents
+3. **C Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` to analyze C code implementation against design specifications (not relevant for Android based development)
+4. **Kiro-IDE**: Use Kiro Spec-Driven Development to create detailed specifications.
+5. **Kiro-CLI**: Use Kiro to iterate over implementation, testing and code deployments to Android emulator
