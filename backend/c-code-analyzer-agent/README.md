@@ -1,10 +1,4 @@
-# Automotive Multi-Agent Analysis System
-
-This project implements multiple multi-agent systems for automotive software development using Strands agents deployed on Amazon Bedrock AgentCore Runtime with inbound authentication.
-
-## Components
-
-### 1. C Code Analyzer (Main Directory)
+#  C Code Analyzer and Test Generator
 Multi-agent system for automotive C code analysis with custom automotive coding standards compliance checking and unit test generation.
 
 ## Overview
@@ -61,46 +55,34 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 
 ## Getting Started
 
-### C Code Analyzer (Main Directory)
+### Prerequisites
+- Python 3.13+
+- AWS CLI configured
+- Amazon Bedrock access
+- AgentCore Runtime permissions
 
-1. **Prerequisites**:
-   - Python 3.13+
-   - AWS credentials configured
-   - Amazon Bedrock AgentCore SDK access
+### 1. Deploy Infrastructure
+Run notebook cells. This will deploy the agent to the agentcore runtime.
 
-2. **Installation**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 2. Adjust the Settings/Steering Files for Local IDE
+- For Kiro, extend the default setup in the workspace (`./kiro` folder) by adding the c-code analyzer configuration. Add additional steering file under '/ide-support/kiro'
+- For Cline, use `./ide-support/cline`.
+- Adjust the Cognito Client-Id from your deployment from step 1.
+- Adjust your local Python path to the `c_code_analyzer.py` if necessary.
+- Adjust your Python path if necessary.
 
-3. **Run the C Code Analysis Notebook**:
-   ```bash
-   jupyter notebook automotive_c_analyzer_notebook.ipynb
-   ```
+### Troubleshooting
 
-### Requirements Analyzer (Backend Directory)
+If you encounter deployment issues:
 
-1. **Navigate to backend**:
-   ```bash
-   cd backend
-   ```
+1. Ensure all dependencies are installed
+2. Check AWS credentials are configured
+3. Review the notebook output for specific error messages
 
-2. **Install backend dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Requirements Analysis Notebook**:
-   ```bash
-   jupyter notebook automotive_requirements_agent_notebook.ipynb
-   ```
-
-### MCP Configuration for IDEs
-
-- Take applicable mcp.json file under `ide-support` and put it to the expected path of your IDE
-  - For Kiro: .kiro/settings/mcp.json
-- Set path to your local python environment in mcp.json
-- Set Cognito client-id in mcp.json
+For 424 "Failed Dependency" errors, the issue is typically related to:
+- Missing dependencies in requirements.txt
+- Docker container build failures
+- Import errors in the Python code
 
 ## Sample Test Cases
 
@@ -109,8 +91,6 @@ The notebook includes three test cases using files from `sample_automotive_code/
 1. **Severe Violations** (`sample_with_severe_violations.c`): C code with malloc/free usage (blocks unit test generation)
 2. **Minor Violations** (`sample_with_minor_violations.c`): C code with C++ style comments (allows unit test generation)
 3. **Compliant Code** (`sample_automotive_compliant.c`): Automotive-compliant C code (generates comprehensive unit tests)
-
-Generated unit tests are returned as part of the agent response and can be saved manually if needed.
 
 ## Custom Automotive Coding Standards Checked
 
@@ -126,47 +106,3 @@ Generated unit tests are returned as part of the agent response and can be saved
 - IAM role-based permissions
 - Secure deployment on AgentCore Runtime
 
-## Cleanup
-
-The notebook includes optional cleanup code to remove:
-- AgentCore Runtime instances
-- ECR repositories
-- IAM roles (manual cleanup may be required)
-
-## Automotive Focus
-
-This implementation is specifically designed for automotive software development with:
-- Safety-critical code analysis
-- Custom automotive coding standards compliance checking
-- Automotive testing standards
-- Production-ready deployment architecture
-
-## Requirements Analyzer (Backend)
-
-The backend directory contains a separate multi-agent system for business requirements analysis:
-
-### Features
-- **Business Requirements Focus**: Analyzes documents from `requirements/weather-app/business/`
-- **Consistency Analysis**: Checks for conflicting business requirements
-- **Completeness Assessment**: Identifies missing business sections
-- **User Acceptance Test Generation**: Creates business-focused test specifications
-- **Conditional Execution**: Only generates tests when quality standards are met
-
-### Architecture
-```
-┌─────────────────────────┐    Condition: No HIGH    ┌─────────────────────────────┐
-│ Requirements Consistency │────severity violations───▶│ User Acceptance Test        │
-│ Analyzer (Entry Point)  │                          │ Generator (Conditional Node)│
-└─────────────────────────┘                          └─────────────────────────────┘
-```
-
-### Usage
-See `backend/requirements-agent/README.md` for detailed instructions on running the requirements analyzer.
-
-## Next Steps
-
-- Extend custom automotive coding standards rule coverage
-- Add support for additional automotive standards (ISO 26262)
-- Integrate requirements and C code analysis workflows
-- Add integration with automotive CI/CD pipelines
-- Expand business requirements analysis capabilities

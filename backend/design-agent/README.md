@@ -24,7 +24,7 @@ The automotive technical design generator is implemented using Strands Agents fr
 - **Framework**: Strands Agents with AgentCore Gateway integration
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Models**: Claude 4.5 Haiku
+- **Model**: Nova 2 Lite
 - **Guidelines**: S3-stored design guidelines accessed via AgentCore Gateway
 
 ## Components
@@ -59,11 +59,11 @@ The automotive technical design generator is implemented using Strands Agents fr
 Run notebook cells. This will deploy the agent to the agentcore runtime and an MCP server retrieving guidelines to AgentCore Gateway.
 
 ### 2. Adjust the Settings/Steering Files for Local IDE
-- For Kiro, copy the configuration files from `.ide-support/kiro`. 
+- For Kiro, use the default setup in the workspace (`./kiro` folder). 
 - For Cline, use `./ide-support/cline`.
 - Adjust the Cognito Client-Id from your deployment from step 1.
 - Adjust your local Python path to the `design-server.py` if necessary.
-- Adjust your local Python if necessary.
+- Adjust your Python path if necessary.
 
 ### Troubleshooting
 

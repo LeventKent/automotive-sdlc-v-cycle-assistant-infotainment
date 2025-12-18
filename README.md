@@ -4,9 +4,9 @@ In this demo we are showcasing an a agentic V-Cycle assistant based on Kiro and 
 
 Demo Flow:
 
-- Kiro makes use of Strands impl. hosted on Bedrock AgentCore (exposed as MCP endpoints to Kiro) to handle requirements analysis, user acceptance test generation and technical design generation
-- Kiro IDE used to do spec driven dev. to decompose tasks based on 1).
-- Kiro-CLI is used to iterate over coding, testing and deployment via Android emulators.
+1. Kiro makes use of Strands impl. hosted on Bedrock AgentCore (exposed as MCP endpoints to Kiro) to handle requirements analysis, user acceptance test generation and technical design generation
+2. Kiro IDE used to to create detailed specifications using spec driven development. At the end Kiro comes up with decomposed tasks based on the documents from step 1.
+3. Kiro-CLI is used to iterate over coding, testing and deployment via Android emulators.
 
 ![V-Cycle Assistant Architecture Diagram](./images/v-cycle-assistant-arch-diagram.png)
 
@@ -67,7 +67,7 @@ Multi-agent system for automotive C code analysis with custom automotive coding 
 **Documentation:** See [C Code Analyzer README](backend/c-code-analyzer-agent/README.md) for detailed setup and usage instructions.
 
 ## IDE Integration Support
-MCP servers and configuration files for seamless IDE integration with Kiro, Cline, and Amazon Q.
+The project support Kiro and Cline based integrations. Kiro with Android setup is already set as the default and the files are available directly under ./kiro. Additional configuration files are available under 
 - **Location**: `ide-support/`
 - See respective README files for detailed instructions. 
 
@@ -80,52 +80,37 @@ MCP servers and configuration files for seamless IDE integration with Kiro, Clin
 
 ### C Code Analyzer Agent
 
-The C Code Analyzer provides automotive C code analysis with custom coding standards compliance checking and automated unit test generation.
-
-For detailed setup instructions, sample test cases, and advanced usage, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
+For detailed setup instructions see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
 
 ### Requirements Analyzer Agent
 
-The Requirements Analyzer focuses on business and technical requirements analysis with user acceptance test generation.
-
-For detailed setup instructions, path configuration, and troubleshooting, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
+For detailed setup instructions, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
 
 ### Software Design Agent
 
-The Software Design Agent transforms validated requirements into comprehensive technical design documents with conditional quality validation.
+For detailed setup instructions see the [Software Design Agent README](backend/design-agent/README.md).
 
-For detailed setup instructions, design completeness analysis, and validation workflows, see the [Software Design Agent README](backend/design-agent/README.md).
+## Available MCP Tools
 
-### MCP Server Integration for IDEs
+Once your IDE MCP configuration is completed according to the `backend/xx-agent/README.md` files above, your IDE will have access to the following MCP tools.
 
-#### Kiro IDE Setup
-1. Copy MCP configuration:
-   ```bash
-   cp ide-support/kiro/settings/mcp.json .kiro/settings/mcp.json
-   ```
-2. Update the configuration with your Python environment path and Cognito client-id
-3. Restart Kiro to load the MCP servers
+### Automotive Requirements MCP Server  
+- **Location**: `mcp-servers/automotive-requirements-mcp/`
+- **Function**: `mcp_automotive_requirements_automotive_requirements_analyzer`
+- **Purpose**: Analyze requirements documents and generate user acceptance tests
+- **Usage**: Integrated into IDEs via MCP protocol
 
-#### Cline IDE Setup
-1. Copy MCP configuration:
-   ```bash
-   cp ide-support/cline/cline_mcp_settings.json ~/.cline/mcp_settings.json
-   ```
-2. Update paths and credentials as needed
+### Automotive Design MCP Server
+- **Location**: `mcp-servers/automotive-design-mcp/`
+- **Function**: `mcp_automotive_design_automotive_design_generator`
+- **Purpose**: Generate technical design documents from requirements documents 
+- **Usage**: Integrated into IDEs via MCP protocol
 
-#### Available MCP Tools
-- `mcp_automotive_requirements_automotive_requirements_analyzer` - Analyze requirements documents
-- `mcp_automotive_design_automotive_design_generator` - Generate technical design from requirements
-- `mcp_automotive_coding_analyze_c_code` - Analyze C code for automotive standards
-
-### Requirements Analysis  
-The Requirements Analyzer works with sample business and technical requirements documents located in `weather-app/`. For detailed information about requirements analysis workflows and test case generation, see the [Requirements Analyzer README](backend/requirements-agent/README.md).
-
-### Software Design Generation
-The Software Design Agent uses validated requirements from the Requirements Analyzer to generate comprehensive technical design documents. For detailed information about design completeness analysis, validation workflows, and ISO 26262 alignment, see the [Software Design Agent README](backend/design-agent/README.md).
-
-### C Code Analysis
-The C Code Analyzer includes sample automotive C code with varying levels of compliance violations. For detailed information about test cases, generated unit tests, and automotive coding standards, see the [C Code Analyzer README](backend/c-code-analyzer-agent/README.md).
+### Automotive Coding MCP Server
+- **Location**: `mcp-servers/automotive-coding-mcp/`
+- **Function**: `mcp_automotive_coding_analyze_c_code`
+- **Purpose**: Analyze C code for automotive standards compliance and generate unit tests
+- **Usage**: Integrated into IDEs via MCP protocol
 
 ## Security & Deployment
 
@@ -134,54 +119,8 @@ The C Code Analyzer includes sample automotive C code with varying levels of com
 - **Runtime**: Secure deployment on Amazon Bedrock AgentCore Runtime
 - **Cleanup**: Optional cleanup procedures for AgentCore instances, ECR repositories, and IAM roles
 
-## Automotive Focus
-
-This system is specifically designed for automotive software development with:
-- Safety-critical code analysis and testing standards
-- Custom automotive coding standards compliance (AUTO-SAFE-001, AUTO-MEM-001, AUTO-FUNC-001, AUTO-STYLE-001)
-- Production-ready deployment architecture
-- Integration with automotive development workflows
-
-## MCP Server Integration
-
-### Model Context Protocol (MCP) Servers
-The project includes MCP servers for seamless IDE integration:
-
-#### Automotive Requirements MCP Server  
-- **Location**: `mcp-servers/automotive-requirements-mcp/`
-- **Function**: `mcp_automotive_requirements_automotive_requirements_analyzer`
-- **Purpose**: Analyze requirements documents and generate user acceptance tests
-- **Usage**: Integrated into IDEs via MCP protocol
-
-#### Automotive Design MCP Server
-- **Location**: `mcp-servers/automotive-design-mcp/`
-- **Function**: `mcp_automotive_design_automotive_design_generator`
-- **Purpose**: Generate technical design documents from validated requirements with conditional quality validation
-- **Usage**: Integrated into IDEs via MCP protocol
-
-#### Automotive Coding MCP Server
-- **Location**: `mcp-servers/automotive-coding-mcp/`
-- **Function**: `mcp_automotive_coding_analyze_c_code`
-- **Purpose**: Analyze C code for automotive standards compliance and generate unit tests
-- **Usage**: Integrated into IDEs via MCP protocol
-
-### IDE Support
-- **Kiro**: Full MCP integration with steering rules and settings
-- **Cline**: Simple MCP configuration for automotive tools
-
-### Benefits of MCP Integration
+## Benefits of MCP Integration
 - **Real-time Analysis**: Analyze code and requirements directly in your IDE
 - **Automated Testing**: Generate unit tests and UATs on-demand
 - **Standards Compliance**: Continuous automotive coding standards checking
 - **Workflow Integration**: Seamless integration with development workflows
-
-## Development Workflow
-
-### Using MCP Tools in IDEs
-The three-agent workflow follows a sequential process from requirements to code:
-
-1. **Requirements Analysis**: Use `#mcp_automotive_requirements_automotive_requirements_analyzer` to validate business and technical requirements
-2. **Design Generation**: Use `#mcp_automotive_design_automotive_design_generator` to generate technical design documents from validated requirements
-3. **C Code Analysis**: Use `#mcp_automotive_coding_analyze_c_code` to analyze C code implementation against design specifications (not relevant for Android based development)
-4. **Kiro-IDE**: Use Kiro Spec-Driven Development to create detailed specifications.
-5. **Kiro-CLI**: Use Kiro to iterate over implementation, testing and code deployments to Android emulator
