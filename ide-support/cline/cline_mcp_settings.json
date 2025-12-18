@@ -5,9 +5,9 @@
       "disabled": false,
       "timeout": 3600,
       "type": "stdio",
-      "command": "~/dev/git/automotive-agents-in-runtime/.venv/bin/python",
+      "command": "<path-to>/.venv/bin/python",
       "args": [
-        "~/dev/git/automotive-agents-in-runtime/automotive-strands-agents-in-runtime/mcp-servers/automotive-coding-mcp/coding-server.py"
+        "<path-to>/mcp-servers/automotive-coding-mcp/coding-server.py"
       ],
       "env": {
         "AWS_REGION": "us-west-2",

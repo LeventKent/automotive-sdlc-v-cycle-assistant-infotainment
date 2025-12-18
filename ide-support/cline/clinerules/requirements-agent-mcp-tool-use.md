@@ -42,12 +42,12 @@ When a user asks for requirements analysis using requirements documents (such as
 
 ```
 User: "Analyze requirements for weather app using weather_app_requirements.md"
-→ Kiro calls MCP tool supplying requirements document content
+→ Cline calls MCP tool supplying requirements document content
 → MCP tool generates analysis report and UAT
-→ Kiro detects JSON output with analysis report and UAT content
-→ Kiro saves analysis to: weather-app/requirements-analysis/weather_app_requirements_analysis.md
-→ Kiro saves UAT to: weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md
-→ Kiro confirms: "Requirements analysis saved to weather-app/requirements-analysis/weather_app_requirements_analysis.md and UAT saved to weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md"
+→ Cline detects JSON output with analysis report and UAT content
+→ Cline saves analysis to: weather-app/requirements-analysis/weather_app_requirements_analysis.md
+→ Cline saves UAT to: weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md
+→ Cline confirms: "Requirements analysis saved to weather-app/requirements-analysis/weather_app_requirements_analysis.md and UAT saved to weather-app/user-acceptance-tests/weather_app_user_acceptance_tests.md"
 ```
 
 ## File Structure Guidelines
