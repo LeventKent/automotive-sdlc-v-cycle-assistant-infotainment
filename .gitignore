@@ -86,6 +86,8 @@ cdk.out
 
 # Bedrock AgentCore 
 .bedrock_agentcore.yaml
+.dockerignore
+Dockerfile
 
 # Kiro workspace settings
 .kiro/settings/

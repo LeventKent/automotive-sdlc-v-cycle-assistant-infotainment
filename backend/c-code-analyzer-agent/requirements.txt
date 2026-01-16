@@ -1,10 +1,2 @@
 strands-agents
-strands-agents-tools
-uv
-boto3
 bedrock-agentcore
-bedrock-agentcore-starter-toolkit
-mcp>=1.9.0
-jupyter
-ipykernel
-regex

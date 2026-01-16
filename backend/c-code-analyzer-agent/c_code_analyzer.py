@@ -66,7 +66,7 @@ def verify_automotive_coding_compliance(c_code: str) -> dict:
     }
 
 # Create the model for all agents
-model_id = "us.anthropic.claude-haiku-4-5-20251001-v1:0" #"us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+model_id = "us.amazon.nova-2-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0" #"us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 model = BedrockModel(model_id=model_id)
 
 # Create the automotive coding standards analyzer agent

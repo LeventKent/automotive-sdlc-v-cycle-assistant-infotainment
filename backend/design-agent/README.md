@@ -24,14 +24,14 @@ The automotive technical design generator is implemented using Strands Agents fr
 - **Framework**: Strands Agents with AgentCore Gateway integration
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Model**: Nova 2 Lite
+- **Model**: Amazon Nova 2 Lite
 - **Guidelines**: S3-stored design guidelines accessed via AgentCore Gateway
 
 ## Components
 
-### 1. Design Generator Agent (`design_generator.py`)
+### 1. Design Generator Agent (`mcp_agent.py`)
 - **Primary Agent**: Generates comprehensive technical design documents
-- **Model**: Claude 4.5 Haiku for high-quality design generation
+- **Model**: Amazon Nova 2 Lite for high-quality design generation
 - **Tools**: AgentCore Gateway tools for accessing design guidelines
 - **Output**: Complete technical design with architecture, safety, and implementation sections
 
@@ -50,8 +50,8 @@ The automotive technical design generator is implemented using Strands Agents fr
 ## Getting Started
 
 ### Prerequisites
-- Python 3.13+
-- AWS CLI configured
+- Python 3.13+ (Recommended: virtual environment at workspace level created and top level requirements installed)
+- AWS CLI configured for a US based region
 - Amazon Bedrock access
 - AgentCore Runtime permissions
 

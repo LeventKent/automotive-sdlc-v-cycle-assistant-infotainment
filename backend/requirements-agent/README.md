@@ -42,9 +42,9 @@ automotive-strands-agents-in-runtime/
 │       ├── requirements_analyzer.py
 │       ├── utils.py
 │       └── requirements.txt
-├── requirements/weather-app/business/          # Business requirements documents
+├── weather-app/business-requirements/          # Business requirements documents
 │   └── weather_app_brd.md
-└── requirements/weather-app/technical/         # Technical requirements documents
+└── weather-app/technical-requirements/         # Technical requirements documents
     └── weather_app_srs.md
 ```
 
@@ -59,8 +59,8 @@ automotive-strands-agents-in-runtime/
 ## Getting Started
 
 ### Prerequisites
-- Python 3.13+
-- AWS CLI configured
+- Python 3.13+ (Recommended: virtual environment at workspace level created and top level requirements installed)
+- AWS CLI configured for a US based region
 - Amazon Bedrock access
 - AgentCore Runtime permissions
 
