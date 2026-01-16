@@ -1,0 +1,6 @@
+boto3
+bedrock-agentcore-starter-toolkit
+ipykernel
+strands-agents
+mcp
+fastmcp

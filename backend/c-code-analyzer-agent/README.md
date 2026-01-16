@@ -22,7 +22,7 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 - **Graph Pattern**: Strands GraphBuilder with conditional edges
 - **Authentication**: Amazon Cognito with JWT tokens
 - **Runtime**: Amazon Bedrock AgentCore Runtime
-- **Model**: Anthropic Claude Haiku 4.5
+- **Model**: Amazon Nova 2 Lite
 
 ## Key Features
 
@@ -56,8 +56,8 @@ The system uses a **conditional sequential graph** pattern with 2 nodes:
 ## Getting Started
 
 ### Prerequisites
-- Python 3.13+
-- AWS CLI configured
+- Python 3.13+ (Recommended: virtual environment at workspace level created and top level requirements installed)
+- AWS CLI configured for a US based region
 - Amazon Bedrock access
 - AgentCore Runtime permissions
 

@@ -74,8 +74,8 @@ The project support Kiro and Cline based integrations. Kiro with Android setup i
 ## Getting Started
 
 ### Prerequisites
-- Python 3.13+
-- AWS credentials configured
+- Python 3.13+ (Recommended: virtual environment at workspace level created and top level requirements installed)
+- AWS credentials configured for a US based region
 - Amazon Bedrock AgentCore SDK access
 
 ### C Code Analyzer Agent
