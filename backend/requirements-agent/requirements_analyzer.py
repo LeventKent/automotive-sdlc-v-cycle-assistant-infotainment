@@ -15,10 +15,16 @@ from strands.models import BedrockModel
 from strands.multiagent import GraphBuilder
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 import json
+import logging
 import re
-import traceback
 from datetime import datetime
 from typing import Dict, Any
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = BedrockAgentCoreApp()
 
@@ -130,6 +136,11 @@ uat_generator_agent = Agent(
 1. Generate user acceptance tests based on requirements
 2. Follow automotive testing standards
 
+You receive an upstream requirements analysis report as input. Use it as context only.
+Output ONLY the user acceptance test specification, starting directly with its title heading.
+Do NOT restate, quote, summarize, or acknowledge the analysis report, and do NOT add any
+preamble or transition text before the specification.
+
 Generate clean, well-documented test specifications that can be easily executed by test teams."""
 )
 
@@ -159,6 +170,30 @@ def build_requirements_analyzer_graph():
 requirements_graph = build_requirements_analyzer_graph()
 
 
+def extract_md(node_result) -> str:
+    """
+    Extract just the generated markdown document from a Strands AgentResult.
+
+    Returning the AgentResult itself forces the runtime to stringify the whole object
+    (stop_reason, metrics, traces, token usage), which bloats the response by tens of
+    thousands of characters and double-escapes the markdown.
+    """
+    if node_result is None:
+        return ""
+
+    result = getattr(node_result, "result", node_result)
+    message = getattr(result, "message", None)
+    if not isinstance(message, dict):
+        return str(result).strip()
+
+    blocks = message.get("content", []) or []
+    text = "\n".join(
+        block["text"] for block in blocks
+        if isinstance(block, dict) and isinstance(block.get("text"), str)
+    )
+    return text.strip() or str(result).strip()
+
+
 @app.entrypoint
 def automotive_requirements_analyzer(payload):
     """
@@ -168,7 +203,7 @@ def automotive_requirements_analyzer(payload):
     if not requirements_docs:
         return {"error": "No requirements documents provided"}
     
-    print(f"Analyzing requirements documents: {requirements_docs[:100]}...")
+    logger.info("Analyzing requirements documents (%d chars)", len(requirements_docs))
     
     # Create the analysis prompt
     analysis_prompt = f"""Analyze these automotive requirements documents for consistency, completeness, and quality issues:
@@ -181,14 +216,21 @@ Please use the analyze_requirements_consistency tool to analyze the requirements
     try:
         graph_result = requirements_graph(analysis_prompt)
         
-        print(f"Graph execution completed. Nodes executed: {graph_result.completed_nodes}/{graph_result.total_nodes}")
-        print(f"Execution order: {[node.node_id for node in graph_result.execution_order]}")
+        logger.info(
+            "Graph execution completed. Nodes executed: %s/%s",
+            graph_result.completed_nodes,
+            graph_result.total_nodes,
+        )
+        logger.debug(
+            "Execution order: %s",
+            [node.node_id for node in graph_result.execution_order],
+        )
         
         # Build the response structure
         result = {
             "execution_time_ms": graph_result.execution_time,
             "step1_requirements_analysis": {
-                "analysis": graph_result.results.get("requirements_analyzer", {}).result if graph_result.results.get("requirements_analyzer") else "No requirements analysis performed",
+                "analysis": extract_md(graph_result.results.get("requirements_analyzer")) or "No requirements analysis performed",
                 "issues": "See analysis above for detailed issue information"
             }
         }
@@ -197,23 +239,21 @@ Please use the analyze_requirements_consistency tool to analyze the requirements
         if "uat_generator" in graph_result.results:
             result["step2_user_acceptance_tests"] = {
                 "generated": True,
-                "tests": graph_result.results["uat_generator"].result
+                "tests": extract_md(graph_result.results["uat_generator"])
             }
-            print("User acceptance tests generated successfully.")
+            logger.info("User acceptance tests generated successfully.")
         else:
             result["step2_user_acceptance_tests"] = {
                 "generated": False,
                 "reason": "User acceptance test generation failed unexpectedly."
             }
-            print("User acceptance test generation failed.")
+            logger.warning("User acceptance test generation failed.")
         
         # Return the final result from the graph
         return result
         
     except Exception as e:
-        print(f"Error during graph execution: {e}")
-        print("Full stack trace:")
-        traceback.print_exc()
+        logger.exception("Graph execution failed")
         return {
             "error": f"Graph execution failed: {str(e)}",
             "step1_requirements_analysis": {"analysis": "Analysis failed", "issues": []},
