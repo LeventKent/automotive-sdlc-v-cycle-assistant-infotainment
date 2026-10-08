@@ -2,13 +2,15 @@ import os
 import time
 import json
 import asyncio
+import logging
 import requests
+from contextlib import asynccontextmanager
 from typing import Dict, Any, Optional
 
 from strands import Agent
 from strands.models import BedrockModel
 from strands.tools.mcp.mcp_client import MCPClient
-from mcp.client.streamable_http import streamablehttp_client
+from mcp.client.streamable_http import create_mcp_http_client, streamable_http_client
 from bedrock_agentcore import BedrockAgentCoreApp
 from boto3.session import Session
 
@@ -23,6 +25,12 @@ boto_session = Session()
 REGION = boto_session.region_name
 
 # Initialize the AgentCore Runtime application
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 # This wrapper makes our agent deployable to AgentCore
 app = BedrockAgentCoreApp()
 
@@ -43,22 +51,31 @@ def get_token(user_pool_id: str, client_id: str, client_secret: str, scope_strin
             "scope": scope_string,
 
         }
-        print(client_id)
+        logger.debug("Requesting gateway token for client_id=%s", client_id)
         response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
         return response.json()
 
     except requests.exceptions.RequestException as err:
+        logger.error("Gateway token request failed: %s", err)
         return {"error": str(err)}
 
 
 scopeString=f"{RESOURCE_SERVER_ID}/gateway:read {RESOURCE_SERVER_ID}/gateway:write"
 token_response = get_token(GATEWAY_USER_POOL_ID, GATEWAY_CLIENT_ID, GATEWAY_CLIENT_SECRET,scopeString,REGION)
 token = token_response["access_token"]
-print("Token response:", token)
+# Never log the token itself; it is a bearer credential for the gateway.
+logger.info("Gateway access token acquired")
 
-def create_streamable_http_transport():
-    return streamablehttp_client(GATEWAY_URL,headers={"Authorization": f"Bearer {token}"})
+@asynccontextmanager
+async def create_streamable_http_transport():
+    """Open a streamable HTTP transport to the AgentCore Gateway."""
+    headers = {"Authorization": f"Bearer {token}"}
+    # streamable_http_client only closes a client it created itself, so keep the
+    # caller-provided client's lifetime bound to the transport's.
+    async with create_mcp_http_client(headers=headers) as http_client:
+        async with streamable_http_client(url=GATEWAY_URL, http_client=http_client) as streams:
+            yield streams
 
 client = MCPClient(create_streamable_http_transport)
 client.start()
@@ -103,7 +120,7 @@ def automotive_design_generator(payload):
                 "error": "No SRS documents provided",
                 "message": "The 'srs_documents' field is required in the payload"
             }
-            print(f"[ERROR] {error_response['error']}")
+            logger.error(error_response["error"])
             return error_response
 
         if not brd_documents:
@@ -111,7 +128,7 @@ def automotive_design_generator(payload):
                 "error": "No BRD documents provided",
                 "message": "The 'brd_documents' field is required in the payload"
             }
-            print(f"[ERROR] {error_response['error']}")
+            logger.error(error_response["error"])
             return error_response
 
         prompt = f"""Generate a comprehensive technical design document from the following validated requirements:
@@ -134,7 +151,7 @@ IMPORTANT: Before generating the design, retrieve and incorporate relevant desig
 
 Generate a complete technical design document that covers all required sections. NEVER include code in the technical design."""
 
-        print("[INFO] Executing design agent...")
+        logger.info("Executing design agent...")
 
         # Execute agent using async invoke
         import asyncio
@@ -143,7 +160,7 @@ Generate a complete technical design document that covers all required sections.
 
         # Calculate execution time
         execution_time_ms = int((time.time() - start_time) * 1000)
-        print(f"[INFO] Agent execution completed in {execution_time_ms}ms")
+        logger.info("Agent execution completed in %dms", execution_time_ms)
 
         # Extract result text
         design_text = str(result)
@@ -161,7 +178,7 @@ Generate a complete technical design document that covers all required sections.
             }
         }
 
-        print("[INFO] automotive_design_generator completed successfully")
+        logger.info("automotive_design_generator completed successfully")
         return response
 
     except Exception as e:
@@ -172,9 +189,7 @@ Generate a complete technical design document that covers all required sections.
             "message": str(e),
             "execution_time_ms": execution_time_ms
         }
-        print(f"[ERROR] Design generation failed: {e}")
-        import traceback
-        print(f"[ERROR] Traceback: {traceback.format_exc()}")
+        logger.exception("Design generation failed")
         return error_response
 
 if __name__ == "__main__":
