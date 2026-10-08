@@ -3,8 +3,15 @@ from strands.models import BedrockModel
 from strands.multiagent import GraphBuilder
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 import json
+import logging
 import re
 from datetime import datetime
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = BedrockAgentCoreApp()
 
@@ -112,7 +119,7 @@ def should_generate_tests(state):
     """
     automotive_result = state.results.get("automotive_analyzer")
     if not automotive_result:
-        print("DEBUG: No automotive analyzer result found")
+        logger.debug("No automotive analyzer result found")
         return False
     
     # Extract the analysis result from the agent's response
@@ -138,11 +145,11 @@ def should_generate_tests(state):
     # Check for blocking patterns
     for pattern in blocking_patterns:
         if pattern in result_text:
-            print(f"DEBUG: Found blocking pattern: {pattern}")
+            logger.debug("Found blocking pattern: %s", pattern)
             return False
         
     # Default: if no blocking patterns found, allow unit test generation
-    print("DEBUG: No blocking patterns found, allowing unit test generation")
+    logger.debug("No blocking patterns found, allowing unit test generation")
     return True
 
 # Build the multi-agent graph
@@ -177,7 +184,7 @@ def automotive_c_analyzer(payload):
     if not c_code:
         return {"error": "No C code provided"}
     
-    print(f"Analyzing C code: {c_code[:100]}...")
+    logger.info("Analyzing C code (%d chars)", len(c_code))
     
     # Create the analysis prompt
     analysis_prompt = f"""Analyze this automotive C code for custom automotive coding standards violations and provide detailed feedback:
@@ -190,8 +197,15 @@ Please use the verify_automotive_coding_compliance tool to analyze the code and 
     try:
         graph_result = automotive_graph(analysis_prompt)
         
-        print(f"Graph execution completed. Nodes executed: {graph_result.completed_nodes}/{graph_result.total_nodes}")
-        print(f"Execution order: {[node.node_id for node in graph_result.execution_order]}")
+        logger.info(
+            "Graph execution completed. Nodes executed: %s/%s",
+            graph_result.completed_nodes,
+            graph_result.total_nodes,
+        )
+        logger.debug(
+            "Execution order: %s",
+            [node.node_id for node in graph_result.execution_order],
+        )
         
         # Build the response structure
         result = {
@@ -208,19 +222,19 @@ Please use the verify_automotive_coding_compliance tool to analyze the code and 
                 "generated": True,
                 "tests": graph_result.results["unit_test_generator"].result
             }
-            print("Unit tests generated successfully.")
+            logger.info("Unit tests generated successfully.")
         else:
             result["step2_unit_tests"] = {
                 "generated": False,
                 "reason": "Unit test generation was skipped due to severe automotive coding standards violations or analysis failure."
             }
-            print("Unit test generation was skipped.")
+            logger.warning("Unit test generation was skipped.")
         
         # Return the final result from the graph (last executed node)
         return result
         
     except Exception as e:
-        print(f"Error during graph execution: {e}")
+        logger.exception("Graph execution failed")
         return {
             "error": f"Graph execution failed: {str(e)}",
             "step1_automotive_analysis": {"analysis": "Analysis failed", "violations": []},
