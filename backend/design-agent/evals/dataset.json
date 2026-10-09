@@ -1,0 +1,89 @@
+{
+  "description": "Evaluation scenarios for the automotive technical design generator (backend/design-agent/mcp_agent.py). Each turn input is the agent's entrypoint payload. Keys ending in '_file' are resolved by run_evals.py to the file's text (paths relative to this file) and sent without the suffix, e.g. 'srs_documents_file' -> 'srs_documents'. 'expected_response' is the ground truth used by Builtin.Correctness.",
+  "scenarios": [
+    {
+      "scenario_id": "weather-app",
+      "metadata": {
+        "purpose": "Full-size reference case from the repository demo. Checks that hard constraints and numbers are carried over unchanged.",
+        "known_risks": "Earlier runs wrote '6 months from SOP' instead of 'prior to SOP' and assigned ASIL-B although neither document allocates an ASIL."
+      },
+      "turns": [
+        {
+          "input": {
+            "srs_documents_file": "../../../weather-app/technical-requirements/weather_app_srs.md",
+            "brd_documents_file": "../../../weather-app/business-requirements/weather_app_brd.md",
+            "other_documents": ""
+          },
+          "expected_response": "A technical design for an Android Automotive / Android for Cars App Library weather application written in Kotlin. It contains the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. Components cover weather data retrieval from an external weather API, in-vehicle location and connectivity middleware integration, caching with last-known-good data shown with a timestamp, the status bar ambient temperature that stays visible during Apple CarPlay and Android Auto projection and is suppressed when the radio privacy setting is enabled, hourly and 7-day forecasts, favorite locations, a radar map with zoom only while stationary, Google Assistant voice queries, severe weather alerts with audio and a high-visibility pop-up within 60 seconds that stays until acknowledged or the threat passes, alert settings and independent alert volume, a silent weather data stream to vehicle core systems (ADAS, battery management), and internationalization including Celsius/Fahrenheit. Complex interactions such as managing favorites are restricted to when the vehicle is stationary. Targets are taken unchanged from the requirements: current weather within 2 seconds of launch, status bar temperature within 10 seconds of power-on, automatic refresh every 15-30 minutes, 95% of API calls within 500 ms, CPU and memory below 5% of vehicle resources, 99.9% availability, fallback to last known data within 1 second, light/dark switch within 1 second, critical errors reported within 100 ms, health check within 500 ms, location and connectivity updates within 200 ms, TLS 1.2+ encryption, ECU-gated access control with audit logging, OTA updates with rollback, WCAG 2.1 AA contrast, GDPR/CCPA compliance and 30-day log retention. Project constraints are stated correctly: 2 engineers with AAOS and Kotlin experience, ready 6 months prior to SOP, budget limited to $15,000, 1 vehicle test unit and 1 test environment. The design does not invent an ASIL allocation that the requirements do not contain; it keeps infotainment isolated from safety-critical systems as required by SR 1300."
+        }
+      ]
+    },
+    {
+      "scenario_id": "notebook-sample",
+      "metadata": {
+        "purpose": "The small inline example from automotive_technical_design_agent_notebook.ipynb, including other_documents as plain text."
+      },
+      "turns": [
+        {
+          "input": {
+            "srs_documents_file": "data/notebook-sample/srs.md",
+            "brd_documents_file": "data/notebook-sample/brd.md",
+            "other_documents": "Additional context: This is a proof-of-concept weather application for automotive infotainment systems."
+          },
+          "expected_response": "A technical design for a proof-of-concept automotive infotainment weather application in Kotlin with the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. It covers current conditions, a 5-day forecast, location-based weather and an offline cache. It keeps the stated targets: response time under 2 seconds, 99.9% availability, 1000 concurrent users, and encryption in transit and at rest. Safety treats SR-001 (weather alerts must not distract the driver) as ASIL-B, exactly as stated, and SR-002 graceful degradation when the weather service is unavailable, referencing ISO 26262 as required by the BRD constraints. It integrates with the existing infotainment system and supports multiple languages and regions."
+        }
+      ]
+    },
+    {
+      "scenario_id": "ev-charging-planner",
+      "metadata": {
+        "purpose": "Faithfulness to an explicit QM classification and read-only vehicle access. A correct design must not upgrade the app to an ASIL.",
+        "known_risks": "The system prompt always asks for ISO 26262 content, which tempts the model to invent ASIL ratings."
+      },
+      "turns": [
+        {
+          "input": {
+            "srs_documents_file": "data/ev-charging-planner/srs.md",
+            "brd_documents_file": "data/ev-charging-planner/brd.md",
+            "other_documents": ""
+          },
+          "expected_response": "A technical design for an Android Automotive OS 14 EV charging planner in Kotlin with the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. It reads EV_BATTERY_LEVEL and RANGE_REMAINING from VHAL at least every 10 seconds, read-only, and never writes any VHAL property. A planner computes stops that keep arrival state of charge at or above 10%, proposes only CCS2 chargers, and prefers partner chargers when the detour is under 5 km. Availability is checked through OCPI 2.2.1 Locations 15 minutes before arrival. Re-planning happens when consumption deviates more than 15% over 20 km or a charger becomes unavailable. The route is handed to the system navigation app through the AAOS navigation intent instead of implementing turn-by-turn guidance. Acceptance works by single tap or Google Assistant voice confirmation. Prices are shown as provided and no payments are processed. Targets are kept unchanged: initial plan within 3 seconds for routes up to 800 km (p95), re-plan within 2 seconds (p95), memory below 120 MB, TLS 1.2+ with the OCPI token in Android Keystore, at most 6 list items and no free-text input while driving, and stale availability data marked with a timestamp when offline. Safety Considerations state that the application is QM with no ASIL allocated, and address ISO 26262 only through freedom from interference and read-only vehicle access. Constraints are stated correctly: 3 engineers, ready 8 months prior to SOP, budget $40,000 including API licensing. Payment, reservation and preconditioning are out of scope."
+        }
+      ]
+    },
+    {
+      "scenario_id": "tpms-display",
+      "metadata": {
+        "purpose": "Mixed ASIL A / QM design with an interface control document passed as other_documents. Checks correct ASIL allocation, freedom from interference and exact timing values.",
+        "known_risks": "Over-classifying (ASIL B or higher) or ignoring the ICD timing and E2E protection values."
+      },
+      "turns": [
+        {
+          "input": {
+            "srs_documents_file": "data/tpms-display/srs.md",
+            "brd_documents_file": "data/tpms-display/brd.md",
+            "other_documents_file": "data/tpms-display/icd.md"
+          },
+          "expected_response": "A technical design for an Android Automotive OS 14 tire pressure monitoring display in Kotlin with the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. The architecture separates an ASIL A warning path (signal reception, plausibility check, warning card rendering) from QM components (Tires detail screen, unit conversion) and explains how freedom from interference prevents QM parts from delaying or suppressing warnings. It consumes TPMS_Status_01 (CAN ID 0x3A4, 1000 ms cycle plus an event frame within 100 ms of a state change) with CRC8 SAE J1850 and a 4-bit alive counter, and per-wheel signals TpmsPress (2.5 kPa resolution), TpmsTemp, TpmsWarnSts (NO_WARNING, LOW_PRESSURE, RAPID_LOSS) and TpmsSensorSts (OK, FAULT, NOT_LEARNED). Timing and behaviour are kept unchanged: warning card within 500 ms (p99), warning path active within 2 seconds of display availability, signal timeout after 3 seconds shown as a sensor fault ('--') instead of a valid pressure, values with an unchanged alive counter for 3 consecutive messages treated as invalid, a warning card that can be minimized but reappears every ignition cycle while the fault persists, at most 1 action on the card, and logging of every warning and timeout with a monotonic timestamp. Per-wheel pressure, temperature and recommended cold pressure are shown in P, with kPa, bar or psi per the vehicle setting. Safety cites HARA-TPMS-004, hazard HZ-12 and safety goal SG-12 at ASIL A, and keeps the per-wheel detail view QM. It states that the instrument cluster tell-tale and the TPMS ECU firmware are out of scope and that the application never commands the TPMS ECU. Constraints: 2 Kotlin engineers plus a part-time functional safety engineer, software freeze 6 months prior to SOP, budget $60,000 including the ASIL A safety case. Regulatory context: UNECE R141 and FMVSS 138."
+        }
+      ]
+    },
+    {
+      "scenario_id": "driver-profile-sync",
+      "metadata": {
+        "purpose": "Draft requirements with many TBD and PLACEHOLDER items. A faithful design records them as open issues and assumptions instead of inventing values.",
+        "known_risks": "Hallucinated latency targets, budgets, team sizes, sync intervals or API specifications."
+      },
+      "turns": [
+        {
+          "input": {
+            "srs_documents_file": "data/driver-profile-sync/srs.md",
+            "brd_documents_file": "data/driver-profile-sync/brd.md",
+            "other_documents": ""
+          },
+          "expected_response": "A technical design for an Android Automotive OS 14 driver profile sync application in Kotlin with the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. It covers QR sign-in with the companion app, profile download and application of infotainment preferences (media sources, radio presets, display theme, language), seat and mirror memory requests through VHAL SEAT_MEMORY_SET only while the gear is P, upload of preference changes, and deletion of all local driver data on sign-out, with GDPR treated as personal data handling and encryption at rest and in transit. The design explicitly lists the unresolved items as open issues or assumptions rather than inventing values: upload frequency, offline conflict resolution strategy, profile apply time target, key management, data residency, service availability target, the cloud profile REST API specification (placeholder), the QR sign-in protocol, team size, timeline, budget, the subscription retention target, ownership of the cloud backend, and whether fleet operators can pre-provision profiles. Where the design proposes a value for any of these, it is clearly marked as a proposal to be confirmed, not as a requirement."
+        }
+      ]
+    }
+  ]
+}
