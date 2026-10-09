@@ -8,9 +8,9 @@
       "env": {
         "AWS_REGION": "us-west-2",
         "FASTMCP_LOG_LEVEL": "INFO",
-        "COGNITO_CLIENT_ID": "6kou4hilv45c3e2lyyyy2zzzz4", // put your own cognito client id from the notebooks here.
-        "COGNITO_USERNAME": "testuser",
-        "COGNITO_PASSWORD": "MyPassword123!"
+        "COGNITO_CLIENT_ID": "your_cognito_client_id", // put your own cognito client id from the notebooks here.
+        "COGNITO_USERNAME": "your_cognito_user",
+        "COGNITO_PASSWORD": "your_cognito_password"
       },
       "disabled": false,
       "autoApprove": [
@@ -26,9 +26,9 @@
       "env": {
         "AWS_REGION": "us-west-2",
         "FASTMCP_LOG_LEVEL": "INFO",
-        "COGNITO_CLIENT_ID": "6kou4hilv45c3e2lyyyy2zzzz4", // put your own cognito client id from the notebooks here.
-        "COGNITO_USERNAME": "testuser",
-        "COGNITO_PASSWORD": "MyPassword123!"
+        "COGNITO_CLIENT_ID": "your_cognito_client_id", // put your own cognito client id from the notebooks here.
+        "COGNITO_USERNAME": "your_cognito_user",
+        "COGNITO_PASSWORD": "your_cognito_password"
       },
       "disabled": false,
       "autoApprove": [
