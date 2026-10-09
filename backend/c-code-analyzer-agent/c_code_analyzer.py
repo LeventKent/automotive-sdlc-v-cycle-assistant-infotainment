@@ -73,7 +73,7 @@ def verify_automotive_coding_compliance(c_code: str) -> dict:
     }
 
 # Create the model for all agents
-model_id = "us.amazon.nova-2-lite-v1:0" #"us.anthropic.claude-haiku-4-5-20251001-v1:0" #"us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+model_id = "us.amazon.nova-2-lite-v1:0" #"us.anthropic.claude-haiku-5-5"
 model = BedrockModel(model_id=model_id)
 
 # Create the automotive coding standards analyzer agent
@@ -108,8 +108,36 @@ unit_test_agent = Agent(
 3. Follow automotive testing standards
 4. Create tests that are suitable for safety-critical applications
 
+You receive an upstream compliance analysis report as input. Use it as context only.
+Output ONLY the unit tests. Do NOT restate, quote, summarize, or acknowledge the
+analysis report, and do NOT add any preamble before the tests.
+
 Generate clean, well-documented test code that can be easily integrated into a test framework."""
 )
+
+def extract_md(node_result) -> str:
+    """
+    Extract just the generated markdown document from a Strands AgentResult.
+
+    Returning the AgentResult itself leaves the payload non-serializable, so the
+    runtime falls back to str() and emits a Python repr carrying stop_reason,
+    metrics, traces and token usage instead of clean JSON.
+    """
+    if node_result is None:
+        return ""
+
+    result = getattr(node_result, "result", node_result)
+    message = getattr(result, "message", None)
+    if not isinstance(message, dict):
+        return str(result).strip()
+
+    blocks = message.get("content", []) or []
+    text = "\n".join(
+        block["text"] for block in blocks
+        if isinstance(block, dict) and isinstance(block.get("text"), str)
+    )
+    return text.strip() or str(result).strip()
+
 
 # Define condition function to check if unit tests should be generated
 def should_generate_tests(state):
@@ -122,12 +150,9 @@ def should_generate_tests(state):
         logger.debug("No automotive analyzer result found")
         return False
     
-    # Extract the analysis result from the agent's response
-    # The automotive_result is an AgentResult object, we need to access its .result attribute
-    if hasattr(automotive_result, 'result'):
-        result_text = str(automotive_result.result).lower()
-    else:
-        result_text = str(automotive_result).lower()
+    # Match against the analysis text only. Stringifying the whole AgentResult
+    # would also search the tool input (the submitted C code) and the metrics.
+    result_text = extract_md(automotive_result).lower()
 
     
     # Simple approach: Look for HIGH severity violations that should block unit test generation
@@ -211,7 +236,7 @@ Please use the verify_automotive_coding_compliance tool to analyze the code and 
         result = {
             "execution_time_ms": graph_result.execution_time,
             "step1_automotive_analysis": {
-                "analysis": graph_result.results.get("automotive_analyzer", {}).result if graph_result.results.get("automotive_analyzer") else "No automotive standards analysis performed",
+                "analysis": extract_md(graph_result.results.get("automotive_analyzer")) or "No automotive standards analysis performed",
                 "violations": "See analysis above for detailed violation information"
             }
         }
@@ -220,7 +245,7 @@ Please use the verify_automotive_coding_compliance tool to analyze the code and 
         if "unit_test_generator" in graph_result.results:
             result["step2_unit_tests"] = {
                 "generated": True,
-                "tests": graph_result.results["unit_test_generator"].result
+                "tests": extract_md(graph_result.results["unit_test_generator"])
             }
             logger.info("Unit tests generated successfully.")
         else:
