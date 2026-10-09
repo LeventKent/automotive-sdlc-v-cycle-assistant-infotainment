@@ -4,9 +4,67 @@ Deploy Design Guidelines CloudFormation Stack
 """
 
 import boto3
+import os
 import time
 import json
 from botocore.exceptions import ClientError
+
+# Guideline markdown files live next to the agent, in backend/guidelines/.
+# They are the single source of truth and are uploaded verbatim after the
+# stack is created, so the files on disk and the objects in S3 cannot drift.
+GUIDELINES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "guidelines")
+
+
+def upload_guidelines(bucket_name, guidelines_dir=GUIDELINES_DIR):
+    """
+    Upload every markdown guideline file to the S3 bucket.
+
+    Mirrors the CDK BucketDeployment/Source.asset pattern: the directory on
+    disk is the source of truth, and each file is uploaded as-is.
+
+    Args:
+        bucket_name: Name of the target S3 bucket
+        guidelines_dir: Directory containing the guideline .md files
+
+    Returns:
+        List of uploaded object keys, or None if the upload failed
+    """
+    guidelines_dir = os.path.normpath(guidelines_dir)
+
+    if not os.path.isdir(guidelines_dir):
+        print(f"Guidelines directory not found: {guidelines_dir}")
+        return None
+
+    md_files = sorted(f for f in os.listdir(guidelines_dir) if f.endswith('.md'))
+
+    if not md_files:
+        print(f"No .md files found in {guidelines_dir}")
+        return None
+
+    try:
+        s3_client = boto3.client('s3')
+        uploaded = []
+
+        print(f"Uploading {len(md_files)} guideline file(s) from {guidelines_dir}")
+
+        for file_name in md_files:
+            file_path = os.path.join(guidelines_dir, file_name)
+            with open(file_path, 'rb') as f:
+                s3_client.put_object(
+                    Bucket=bucket_name,
+                    Key=file_name,
+                    Body=f.read(),
+                    ContentType='text/markdown'
+                )
+            size = os.path.getsize(file_path)
+            print(f"  uploaded {file_name} ({size} bytes)")
+            uploaded.append(file_name)
+
+        return uploaded
+
+    except Exception as e:
+        print(f"Error uploading guidelines: {str(e)}")
+        return None
 
 
 def deploy_design_guidelines_stack(stack_name="design-guidelines-stack", bucket_prefix="design-guidelines"):
@@ -143,6 +201,15 @@ def deploy_design_guidelines_stack(stack_name="design-guidelines-stack", bucket_
         for key, value in outputs.items():
             print(f"  {key}: {value}")
         
+        # Upload the guideline files. Runs on every deploy, so edits to the
+        # markdown in backend/guidelines/ take effect without recreating the stack.
+        bucket_name = outputs.get('S3BucketName')
+        if bucket_name:
+            if upload_guidelines(bucket_name) is None:
+                print("Warning: guideline upload failed; the bucket may be empty or stale")
+        else:
+            print("Warning: S3BucketName not found in stack outputs, skipping guideline upload")
+        
         return outputs
         
     except Exception as e:
@@ -214,7 +281,7 @@ def delete_design_guidelines_stack(stack_name="design-guidelines-stack"):
             # Extract bucket name from stack outputs
             if 'Outputs' in response['Stacks'][0]:
                 for output in response['Stacks'][0]['Outputs']:
-                    if output['OutputKey'] == 'BucketName':
+                    if output['OutputKey'] == 'S3BucketName':
                         bucket_name = output['OutputValue']
                         print(f"Found S3 bucket: {bucket_name}")
                         break
