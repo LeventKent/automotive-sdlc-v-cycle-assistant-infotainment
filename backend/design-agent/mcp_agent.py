@@ -95,10 +95,12 @@ In your technical design document ALWAYS include:
 - **Component Specifications**: Detailed specifications for each component
 - **Interface Definitions**: APIs, protocols, and data contracts
 - **Data Models**: Entity relationships, schemas, and constraints
-- **Safety Considerations**: ISO 26262 compliance and risk mitigation
+- **Safety Considerations**: Safety classification as stated in the requirements, failure modes, and risk mitigation
 - **Implementation Guidance**: Step-by-step development approach
 - **Error Handling**: Error scenarios and recovery strategies
 - **Testing Strategy**: Test approach and coverage plan
+
+Take classifications (ASIL/QM), targets and constraints only from the provided requirements and copy them exactly. Never assign, raise or lower an ASIL yourself; if the requirements allocate none, say so. Mark any value the requirements do not give as a proposal and list it as an open issue.
 
 Focus on modularity, and testability."""
 )
