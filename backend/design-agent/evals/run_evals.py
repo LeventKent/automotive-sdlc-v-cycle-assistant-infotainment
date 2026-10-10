@@ -30,8 +30,14 @@ Usage (from the repository root, with the workspace .venv active)
   pip install -r backend/design-agent/evals/requirements.txt
   python backend/design-agent/evals/run_evals.py --dry-run
   python backend/design-agent/evals/run_evals.py
-  python backend/design-agent/evals/run_evals.py --scenario notebook-sample --verbose
+  python backend/design-agent/evals/run_evals.py --scenario infotainment-simple --verbose
   python backend/design-agent/evals/run_evals.py --fail-under 0.7
+  python backend/design-agent/evals/run_evals.py --no-custom
+  python backend/design-agent/evals/run_evals.py --evaluator SafetyClassificationFidelity
+
+Custom evaluators defined in evals/evaluators/ (deployed with manage_evaluators.py
+deploy) run next to the built-ins automatically. Definitions that are not deployed
+are skipped with a warning.
 
 Results are written to evals/results/<UTC timestamp>/:
   results.json   raw Evaluate API results per scenario and evaluator
@@ -70,6 +76,8 @@ from bedrock_agentcore.evaluation import (
     PredefinedScenario,
     Turn,
 )
+
+from custom_evaluators import display_name, load_local_configs, resolve_custom_evaluator_ids
 
 EVALS_DIR = Path(__file__).resolve().parent
 AGENT_DIR = EVALS_DIR.parent
@@ -345,9 +353,18 @@ def summarize(result: EvaluationResult, evaluator_ids: List[str]) -> Dict[str, A
         }
         by_id = {er.evaluator_id: er.results for er in scenario.evaluator_results}
 
+        # The runner skips every evaluator silently when no spans were collected for the
+        # session (telemetry not exported, or not yet ingested). That is not a pass.
+        if scenario.status == "COMPLETED" and not scenario.evaluator_results:
+            entry["status"] = "NO_SPANS"
+            entry["error"] = (
+                "no spans collected for this session; nothing was evaluated. "
+                "Re-run it with --scenario " + scenario.scenario_id
+            )
+
         for evaluator_id in evaluator_ids:
             raw = by_id.get(evaluator_id)
-            if scenario.status != "COMPLETED":
+            if entry["status"] != "COMPLETED":
                 entry["evaluators"][evaluator_id] = {"status": "NOT_RUN"}
                 continue
             if raw is None:
@@ -387,7 +404,7 @@ def summarize(result: EvaluationResult, evaluator_ids: List[str]) -> Dict[str, A
 
 
 def _short(evaluator_id: str) -> str:
-    return evaluator_id.removeprefix("Builtin.")
+    return display_name(evaluator_id)
 
 
 def print_report(summary: Dict[str, Any], evaluator_ids: List[str], verbose: bool) -> None:
@@ -413,11 +430,13 @@ def print_report(summary: Dict[str, Any], evaluator_ids: List[str], verbose: boo
         for e, w in zip(evaluator_ids, widths)
     ]
     print("mean".ljust(width_id) + "  " + "  ".join(means))
-    print("\nskip = evaluator not applicable (tool evaluators: the agent made no tool call); - = scenario failed\n")
+    print("\nskip = evaluator not applicable (tool evaluators: the agent made no tool call); "
+          "- = scenario failed or no spans\n")
 
     for s in summary["scenarios"]:
         if s["status"] != "COMPLETED":
-            print(f"[{s['scenario_id']}] FAILED: {s['error']}")
+            print(f"[{s['scenario_id']}] {s['status']}: {s['error']}")
+            continue
         for eid in evaluator_ids:
             ev = s["evaluators"][eid]
             if ev.get("errors"):
@@ -470,7 +489,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario", action="append", dest="scenarios",
                         help="Run only this scenario_id. Repeat to select several.")
     parser.add_argument("--evaluator", action="append", dest="evaluators",
-                        help="Override the evaluator list. Repeat to select several.")
+                        help="Override the evaluator list with built-in IDs or custom evaluator names. "
+                             "Repeat to select several.")
+    parser.add_argument("--no-custom", action="store_true",
+                        help="Run only the built-in evaluators, without the custom ones in evals/evaluators/.")
     parser.add_argument("--delay", type=int, default=180,
                         help="Seconds to wait for CloudWatch span ingestion after invocation (default 180).")
     parser.add_argument("--concurrency", type=int, default=2,
@@ -487,6 +509,31 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def select_evaluators(args: argparse.Namespace, region: str) -> List[str]:
+    """Built-ins plus the deployed custom evaluators from evals/evaluators/.
+
+    Custom evaluator IDs are account specific, so they are resolved by name at run time.
+    In --dry-run no AWS call is made and custom evaluators are listed by name only.
+    """
+    custom_names = [c["evaluatorName"] for c in load_local_configs()]
+    requested = args.evaluators or DEFAULT_EVALUATORS + ([] if args.no_custom else custom_names)
+    wanted_custom = [e for e in requested if e in custom_names]
+    if not wanted_custom:
+        return list(requested)
+    if args.dry_run:
+        return [f"{e} (custom, resolved at run time)" if e in custom_names else e for e in requested]
+
+    deployed_ids, problems = resolve_custom_evaluator_ids(region)
+    by_name = {display_name(i): i for i in deployed_ids}
+    for problem in problems:
+        logger.warning("Custom evaluator skipped: %s", problem)
+    if args.evaluators:
+        missing = [e for e in wanted_custom if e not in by_name]
+        if missing:
+            raise SystemExit(f"Requested custom evaluator(s) not available: {', '.join(missing)}")
+    return [by_name[e] if e in custom_names else e for e in requested if e not in custom_names or e in by_name]
+
+
 def main() -> int:
     args = parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
@@ -495,7 +542,7 @@ def main() -> int:
 
     target = load_default_agent(args.agent_config.resolve())
     dataset = load_dataset(args.dataset.resolve(), args.scenarios)
-    evaluator_ids = args.evaluators or DEFAULT_EVALUATORS
+    evaluator_ids = select_evaluators(args, target.region)
 
     print(f"Agent      : {target.name} ({target.agent_arn})")
     print(f"Region     : {target.region}")

@@ -19,15 +19,15 @@
       ]
     },
     {
-      "scenario_id": "notebook-sample",
+      "scenario_id": "infotainment-simple",
       "metadata": {
         "purpose": "The small inline example from automotive_technical_design_agent_notebook.ipynb, including other_documents as plain text."
       },
       "turns": [
         {
           "input": {
-            "srs_documents_file": "data/notebook-sample/srs.md",
-            "brd_documents_file": "data/notebook-sample/brd.md",
+            "srs_documents_file": "data/infotainment-simple/srs.md",
+            "brd_documents_file": "data/infotainment-simple/brd.md",
             "other_documents": "Additional context: This is a proof-of-concept weather application for automotive infotainment systems."
           },
           "expected_response": "A technical design for a proof-of-concept automotive infotainment weather application in Kotlin with the sections Architecture Overview (with a component diagram), Component Specifications, Interface Definitions, Data Models, Safety Considerations, Implementation Guidance, Error Handling and Testing Strategy. It covers current conditions, a 5-day forecast, location-based weather and an offline cache. It keeps the stated targets: response time under 2 seconds, 99.9% availability, 1000 concurrent users, and encryption in transit and at rest. Safety treats SR-001 (weather alerts must not distract the driver) as ASIL-B, exactly as stated, and SR-002 graceful degradation when the weather service is unavailable, referencing ISO 26262 as required by the BRD constraints. It integrates with the existing infotainment system and supports multiple languages and regions."
