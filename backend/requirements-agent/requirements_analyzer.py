@@ -32,29 +32,33 @@ app = BedrockAgentCoreApp()
 @tool
 def check_for_incomplete_requirements(requirements_doc_content: str) -> dict:
     """
-    Analyzes business requirements documents for consistency, completeness, and quality.
+    Runs lightweight pattern checks on a requirements document. It flags placeholder
+    text (TODO, TBD, To be determined, PLACEHOLDER, XXX) and FR/NFR references that
+    lack a numeric ID (e.g. a bare "FR" instead of "FR-100"). 
     
     Args:
-        requirements_doc_content: The FULL TEXT CONTENT of the requirements document(s) to analyze.
+        requirements_doc_content: The FULL TEXT CONTENT of the requirements document(s) to check.
     
     Returns:
         A dictionary with issue severity and details including:
         - issues: List of identified issues with type, description, severity, and occurrences
-        - total_issues: Total count of issues found
-        - ready_for_development: Boolean indicating if requirements are ready
-        - severity_counts: Breakdown of issues by severity level (high, medium, low)
+        - total_issues: Number of distinct issue types found (not total occurrences)
+        - ready_for_development: True if no placeholder text was found
+        - severity_counts: Number of issue types per severity level (high, medium, low)
     """
     issues = []
     
     # Automotive requirements analysis checks based on BRD structure
     analysis_patterns = {
         "Missing Functional Requirements IDs": {
-            "pattern": r"(?i)(?:functional requirement|FR)(?!.*\bFR-\d+\b)",
+            # Whole-word "FR" not immediately followed by "-<digits>" (skips "from", "NFR", "FR-100")
+            "pattern": r"\bFR\b(?!-\d+)",
             "description": "Functional requirements should have unique identifiers (e.g., FR-100, FR-110)",
             "severity": "MEDIUM"
         },
         "Missing Non-Functional Requirements IDs": {
-            "pattern": r"(?i)(?:non-functional requirement|NFR)(?!.*\bNFR-\d+\b)",
+            # Whole-word "NFR" not immediately followed by "-<digits>" (skips "NFR-200")
+            "pattern": r"\bNFR\b(?!-\d+)",
             "description": "Non-functional requirements should have unique identifiers (e.g., NFR-100, NFR-110)",
             "severity": "MEDIUM"
         },
