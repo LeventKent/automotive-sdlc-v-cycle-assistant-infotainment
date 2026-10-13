@@ -1,0 +1,43 @@
+{
+  "evaluatorName": "SafetyClassificationFidelity",
+  "description": "Checks that ASIL/QM levels, hazards and safety goals in a technical design trace to the requirements documents and are not invented, raised or lowered.",
+  "level": "TRACE",
+  "instructionsFile": "safety_classification_fidelity.md",
+  "evaluatorConfig": {
+    "llmAsAJudge": {
+      "modelConfig": {
+        "bedrockEvaluatorModelConfig": {
+          "modelId": "us.anthropic.claude-sonnet-4-6",
+          "inferenceConfig": {
+            "maxTokens": 2000,
+            "temperature": 0
+          }
+        }
+      },
+      "ratingScale": {
+        "numerical": [
+          {
+            "value": 1.0,
+            "label": "Fully traceable",
+            "definition": "Every safety classification claim is supported by the requirements or explicitly marked as a proposal. All source allocations are carried over; if the source allocates none, the design says so. Freedom from interference is addressed wherever ASIL and QM parts coexist."
+          },
+          {
+            "value": 0.67,
+            "label": "Minor gaps",
+            "definition": "No unsupported or contradicting level, but there is a gap: a source allocation is missing or only loosely restated, freedom from interference is not addressed for mixed ASIL/QM parts, the unallocated case is not stated explicitly, or informal objectives without IDs or ratings are listed as safety goals although the source has no HARA."
+          },
+          {
+            "value": 0.33,
+            "label": "Unsupported additions",
+            "definition": "The source allocations are reproduced correctly, but the design adds at least one level, or a hazard or safety goal with an ID or rating, that is not in the source and is presented as fact, or classifies the same function differently in different sections."
+          },
+          {
+            "value": 0.0,
+            "label": "Invented or contradicting",
+            "definition": "The design assigns an ASIL as fact where the source allocates none, raises or lowers a level relative to the source, places a source-rated safety function in a lower-integrity component, or contradicts an explicit QM or no-ASIL statement."
+          }
+        ]
+      }
+    }
+  }
+}
